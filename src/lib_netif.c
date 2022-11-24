@@ -1105,11 +1105,7 @@ int lib_net_reuseaddr(int sd) {
 }
 
 int lib_net_disable_fragment(int sd) {
-#ifdef IP_PMTUDISC_PROBE
-    return lib_net_setsockopt(sd, SOL_IP, IP_MTU_DISCOVER, IP_PMTUDISC_PROBE);
-#else
     return lib_net_setsockopt(sd, SOL_IP, IP_MTU_DISCOVER, IP_PMTUDISC_DO);
-#endif
 }
 
 int lib_net_enable_fragment(int sd) {
