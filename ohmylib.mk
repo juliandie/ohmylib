@@ -1,0 +1,2 @@
+OHMYLIB_INCLUDES := ./inc
+OHMYLIB_LIBRARIES := -lohmylib -lrt

@@ -1,0 +1,79 @@
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <signal.h>
+
+#include <lib_log.h>
+#include <lib_udp.h>
+#include <lib_raw.h>
+
+#define PORT (3948)
+#define IFNAME "eth0"
+
+static volatile int run = 1;
+
+static void sig_reset(int signum) {
+	signal(signum, SIG_DFL);
+}
+
+static int sig_register(int signum, void (*handler)(int)) {
+	struct sigaction act = {
+		.sa_flags = SA_RESTART,
+		.sa_handler = handler,
+	};
+	sigemptyset(&act.sa_mask);
+
+	return sigaction(signum, &act, NULL);
+}
+
+static void sig_hdl(int sig) {
+	run = 0;
+	LIB_LOG_DEBUG("received signal %d", sig);
+	sig_reset(sig);
+}
+
+static int my_listener(lib_raw* raw, lib_netpkt* frame) {
+	if (frame == NULL) {
+		LIB_LOG_WARNING("something went wrong");
+		run = 0;
+		return -1;
+	}
+
+	lib_udp_dump_rx_frame(frame);
+
+done:
+	return 0;
+}
+
+int main() {
+	lib_raw raw;
+	int ret;
+
+	sig_register(SIGINT, sig_hdl);
+
+	if (lib_raw_open(&raw, IFNAME))
+		return -1;
+	
+	LIB_LOG_DEBUG("listening on %s:%d", IFNAME, PORT);
+	raw.listener = my_listener;
+
+	while (run) {
+		ret = lib_raw_poll(&raw, -1);
+		switch (ret) {
+		case 0:
+			break;
+		case 1:
+			lib_raw_recv(&raw);
+			break;
+		case -1:
+		default:
+			run = 0;
+			break;
+		}
+
+	}
+
+	lib_raw_close(&raw);
+
+	return 0;
+}
