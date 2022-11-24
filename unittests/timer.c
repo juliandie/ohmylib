@@ -109,8 +109,8 @@ int main() {
     usage();
 
     do {
-        int c;
-        c = fgetc(stdin); // don't use getchar tho!
+        int c = fgetc(stdin); // don't use getchar tho!
+
         switch(c) {
         case 'h':
             printf("\r");

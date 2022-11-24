@@ -27,12 +27,10 @@ static int sig_register(int signum, void (*handler)(int)) {
 
 static void sig_hdl(int sig) {
 	run = 0;
-	LIB_LOG_DEBUG("received signal %d", sig);
 	sig_reset(sig);
 }
 
 static int my_listener(udp_sock*udp, lib_netpkt *frame) {
-	lib_buffer* buf = &frame->tx;
 	if (udp == NULL || frame == NULL) {
 		LIB_LOG_ERR("something went wrong");
 		run = 0;
@@ -48,7 +46,6 @@ static int my_listener(udp_sock*udp, lib_netpkt *frame) {
 		lib_buffer_puta(&frame->tx, "\n", 1);
 
 	udp_send(udp, frame);
-done:
 	return 0;
 }
 
@@ -94,7 +91,6 @@ int main() {
 		}
 	}
 
-cleanup:
 	lib_udp_close(&udp);
 
 	return 0;
