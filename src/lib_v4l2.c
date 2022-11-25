@@ -253,7 +253,6 @@ int v4l_dqbuf(int fd, size_t *len) {
 int v4l_select(int fd, int timeout) {
     struct timeval tv;
     fd_set fds;
-    int ret;
 
     FD_ZERO(&fds);
     FD_SET(fd, &fds);
@@ -266,7 +265,6 @@ int v4l_select(int fd, int timeout) {
 
 int v4l_poll(int fd, int timeout) {
     struct pollfd pfd;
-    int ret;
 
     pfd.fd = fd;
     pfd.events = POLLIN;
