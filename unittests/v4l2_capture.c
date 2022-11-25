@@ -128,6 +128,7 @@ static void *capture_thread(void *arg) {
     struct timespec tp[2];
     int ret, buf_idx;
     float elapsed;
+    size_t len;
     void *buf;
 
     if(!cap)
@@ -155,7 +156,7 @@ static void *capture_thread(void *arg) {
             continue;
         }
 
-        buf_idx = v4l_dqbuf(cap->videofd);
+        buf_idx = v4l_dqbuf(cap->videofd, &len);
         if(buf_idx < 0) {
             switch(errno) {
             case EAGAIN: //continue;
@@ -180,13 +181,13 @@ static void *capture_thread(void *arg) {
         buf = cap->buffer[buf_idx];
 
         if(cap->show_fps) {
-            printf("[f %d/%d] [%.1f FPS]", cap->n_frames, cap->t_frames,
-                   (1.0f / (elapsed / 1000000000)));
+            printf("[f %d/%d] [%.1f FPS] %zuB", cap->n_frames, cap->t_frames,
+                   (1.0f / (elapsed / 1000000000)), len);
         }
 
         if(cap->capture) {
             printf("[c] ");
-            capture_store(cap, buf, 1024);
+            capture_store(cap, buf, len);
         }
 
         if(v4l_qbuf(cap->videofd, buf_idx) < 0) {
@@ -240,6 +241,8 @@ int main(int argc, char **argv) {
         int c = fgetc(stdin); // don't use getchar tho!
 
         switch(c) {
+        case 'f': cap.show_fps = 1 - cap.show_fps; break;
+        case 'c': cap.capture = 1 - cap.capture; break;
         case 'q': goto done;
         default: break;
         }
