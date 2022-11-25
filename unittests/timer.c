@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <termios.h>
-#include <signal.h>
-#include <string.h>
-#include <stdint.h>
 #include <errno.h>
+#include <string.h>
+#include <termios.h>
 #include <time.h>
 #include <signal.h>
 
