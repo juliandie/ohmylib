@@ -32,43 +32,35 @@
 #include <lib_log.h>
 
 static int lib_netif_ioctl(const char *ifname, int code, struct ifreq *ifr) {
-    int sock4, ret;
+    int sock, ret;
 
     if(ifname == NULL) {
         errno = -EINVAL;
         return -1;
     }
-
-    /*AF_INET - to define network interface IPv4*/
-    /*Creating soket for it.*/
-    sock4 = socket(AF_INET, SOCK_DGRAM, 0);
-    //sock6 = socket(AF_INET6, SOCK_DGRAM, 0);
-    if(sock4 < 0)
+    sock = socket(AF_LOCAL, SOCK_DGRAM, 0);
+    if(sock < 0)
         return -1;
 
     strncpy(ifr->ifr_name, ifname, sizeof(ifr->ifr_name) - 1);
-    ret = ioctl(sock4, code, ifr);
-    close(sock4);
+    ret = ioctl(sock, code, ifr);
+    close(sock);
 
     return ret;
 }
 
-int lib_netif_hwaddr(const char *ifname, uint8_t *buf) {
+int lib_netif_hwaddr(const char *ifname, struct if_hwaddr *addr) {
     struct ifreq ifr;
 
-    if(lib_netif_ioctl(ifname, SIOCGIFHWADDR, &ifr) == -1) {
-        LIB_LOG_DEBUG("%s SIOCGIFHWADDR", ifname);
+    if(lib_netif_ioctl(ifname, SIOCGIFHWADDR, &ifr) < 0)
         return -1;
-    }
 
-    if(ifr.ifr_hwaddr.sa_family != ARPHRD_ETHER) {
-        LIB_LOG_DEBUG("%s ARPHRD_ETHER", ifname);
+    if(ifr.ifr_hwaddr.sa_family != ARPHRD_ETHER)
         return -1;
-    }
 
-    if(buf != NULL) { // only check for valid MAC
-        memcpy(buf, ifr.ifr_hwaddr.sa_data, 6);
-    }
+    if(addr)
+        memcpy(addr->mac, ifr.ifr_hwaddr.sa_data, sizeof(struct if_hwaddr));
+    
     return 0;
 }
 
@@ -1056,74 +1048,3 @@ int sys_netif_restart_ipconfig() {
 }
 
 #endif
-
-int lib_net_init_netpkt_sync(lib_netpkt *frame, int size) {
-    memset(frame, 0, sizeof(lib_netpkt));
-    if(lib_buffer_alloc(&frame->rx, size) < 0)
-        return -1;
-
-    if(lib_buffer_alloc(&frame->tx, size) < 0) {
-        lib_buffer_free(&frame->rx);
-        return -1;
-    }
-
-    return 0;
-}
-
-int lib_net_init_netpkt_async(lib_netpkt *frame, int rx_size, int tx_size) {
-    memset(frame, 0, sizeof(lib_netpkt));
-    if(lib_buffer_alloc(&frame->rx, rx_size) < 0)
-        return -1;
-
-    if(lib_buffer_alloc(&frame->tx, tx_size) < 0) {
-        lib_buffer_free(&frame->rx);
-        return -1;
-    }
-
-    return 0;
-}
-
-void lib_net_free_netpkt(lib_netpkt *frame) {
-    lib_buffer_free(&frame->tx);
-    lib_buffer_free(&frame->rx);
-}
-
-static int lib_net_setsockopt(int sd, int lvl, int optname, int optval) {
-    return setsockopt(sd, lvl, optname, &optval, sizeof(int));
-}
-static int lib_net_getsockopt(int sd, int lvl, int optname) {
-    uint32_t len = 4;
-    int val;
-    if(getsockopt(sd, lvl, optname, &val, &len))
-        return -1;
-
-    return val;
-}
-
-int lib_net_reuseaddr(int sd) {
-    return lib_net_setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, 1);
-}
-
-int lib_net_disable_fragment(int sd) {
-    return lib_net_setsockopt(sd, SOL_IP, IP_MTU_DISCOVER, IP_PMTUDISC_DO);
-}
-
-int lib_net_enable_fragment(int sd) {
-    return lib_net_setsockopt(sd, SOL_IP, IP_MTU_DISCOVER, IP_PMTUDISC_DONT);
-}
-
-int lib_net_is_fragmented(int sd) {
-    return lib_net_getsockopt(sd, SOL_IP, IP_MTU_DISCOVER);
-}
-
-int lib_net_enable_pktinfo(int sd) {
-    return lib_net_setsockopt(sd, SOL_IP, IP_PKTINFO, 1);
-}
-
-int lib_net_enable_broadcast(int sd) {
-    return lib_net_setsockopt(sd, SOL_SOCKET, SO_BROADCAST, 1);
-}
-
-int lib_net_bind_to_if(int sd, const char *ifname) {
-    return setsockopt(sd, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname));
-}

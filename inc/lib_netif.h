@@ -5,38 +5,16 @@
 //#include <stdint.h> /** uint_* */
 #include <arpa/inet.h>
 #include <lib_buffer.h>
+#include <net/ethernet.h>
+//#include <net/if_arp.h>
+//#include <netinet/if_ether.h>
 
-#if 0
-typedef uint32_t in_addr_t;
-
-// sys/socket.h
-struct sockaddr_in {
-    __kernel_sa_family_t sin_family; /* Address family */
-    __be16 sin_port; /* Port number */
-
-    struct in_addr {
-        in_addr_t s_addr;
-    } sin_addr; /* Internet address */
+struct if_hwaddr {
+    char mac[ETH_ALEN];
 };
-
-struct sockaddr {
-    sa_family_t	sa_family;	/* address family, AF_xxx	*/
-    char		sa_data[14];	/* 14 bytes of protocol address	*/
-};
-#endif
-
-typedef struct lib_netpkt_s {
-    int sysidx;
-    int broadcast;
-    int raw;
-
-    struct sockaddr_in addr;
-    lib_buffer rx;
-    lib_buffer tx;
-} lib_netpkt;
 
 /** MAC */
-int lib_netif_hwaddr(const char *ifname, uint8_t *buf);
+int lib_netif_hwaddr(const char *ifname, struct if_hwaddr *addr);
 /** IP */
 int lib_netif_has_adr(const char *ifname, const struct sockaddr_in *ina);
 int lib_netif_adr_cnt(const char *ifname);
@@ -72,18 +50,6 @@ int lib_netif_up(const char *ifname);
 
 int lib_netif_interfaces(char ***ifnames);
 void lib_netif_interfaces_free(char **ifnames);
-
-int lib_net_init_netpkt_sync(lib_netpkt *frame, int size);
-int lib_net_init_netpkt_async(lib_netpkt *frame, int rx_size, int tx_size);
-void lib_net_free_netpkt(lib_netpkt *frame);
-
-int lib_net_reuseaddr(int sd);
-int lib_net_disable_fragment(int sd);
-int lib_net_enable_fragment(int sd);
-int lib_net_is_fragmented(int sd);
-int lib_net_enable_pktinfo(int sd);
-int lib_net_enable_broadcast(int sd);
-int lib_net_bind_to_if(int sd, const char *ifname);
 
 #endif
 

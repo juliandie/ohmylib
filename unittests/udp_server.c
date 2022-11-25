@@ -1,14 +1,13 @@
-
+#include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <signal.h>
 
-#include <udp_sock.h>
+#include <lib_sock.h>
 #include <lib_log.h>
-#include <lib_netif.h>
-#include <lib_net.h>
 
 #define PORT (8081)
+
 static volatile int run = 1;
 
 static void sig_reset(int signum) {
@@ -30,6 +29,78 @@ static void sig_hdl(int sig) {
 	sig_reset(sig);
 }
 
+static int server(int fd) {
+	struct sockaddr_in src_addr;
+	socklen_t addrlen;
+	char buf[1500];
+	int ret;
+
+	while(run) {
+        ret = lib_poll(fd, 1000);
+        if(ret < 0)
+            return -1;
+
+        if(ret == 0)
+            continue;
+
+		ret = recvfrom(fd, buf, sizeof(buf), 0,
+					   (struct sockaddr *)&src_addr, &addrlen);
+		if(ret < 0)
+			return -1;
+
+		if(ret == 0)
+			continue;
+		
+		lib_hexdump(buf, ret, "From %s (%dB)", inet_ntoa(src_addr.sin_addr), ret);
+
+		ret = lib_sendto(fd, buf, ret, 0, (struct sockaddr *)&src_addr, addrlen);
+
+		if(ret < 0)
+			return -1;
+
+		if(ret == 0)
+			continue;
+	}
+
+	return 0;
+}
+
+int main(/* int argc, char **argv */) {
+	__be16 port;
+	int fd;
+
+	fd = socket(AF_INET, SOCK_DGRAM, 0);
+	if(fd < 0)
+		goto err;
+
+	if(lib_bind4(fd, INADDR_ANY, htons(PORT)) < 0)
+		goto err_close;
+
+    if(fcntl(fd, F_SETFL, O_NONBLOCK) < 0)
+        LIB_LOG_ERR("F_SETFL: %s", strerror(errno));
+
+	if(lib_sock_mtu_discover_do(fd) < 0)
+		LIB_LOG_ERR("IP_MTU_DISCOVER: %s", strerror(errno));
+
+	if(lib_port(fd, &port) < 0) {
+		goto err_close;
+	}
+
+	LIB_LOG_INFO("port %d", htons(port));
+
+	if(server(fd) < 0)
+		goto err_close;
+
+	close(fd);
+	return 0;
+
+err_close:
+	close(fd);
+err:
+	return -1;
+}
+
+#if 0
 static int my_listener(udp_sock*udp, lib_netpkt *frame) {
 	if (udp == NULL || frame == NULL) {
 		LIB_LOG_ERR("something went wrong");
@@ -49,18 +120,18 @@ static int my_listener(udp_sock*udp, lib_netpkt *frame) {
 	return 0;
 }
 
-int main() {
+int main(int argc, char **argv) {
 	lib_netpkt frame;
-	udp_sock udp;
+	struct udp_sock udp;
 	int ret;
 
 	sig_register(SIGINT, sig_hdl);
 
-	if (udp_open(&udp, PORT) < 0) {
+	if(udp_open(&udp, htonl(INADDR_ANY), htons(PORT)) < 0) {
 		return -1;
 	}
 
-	if (lib_net_init_netpkt_async(&frame, 8, 32)) {
+	if(lib_net_init_netpkt_async(&frame, 8, 32)) {
 		return -1;
 	}
 
@@ -95,3 +166,4 @@ int main() {
 
 	return 0;
 }
+#endif
