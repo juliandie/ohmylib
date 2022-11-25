@@ -18,7 +18,7 @@ int v4l_mmap_buffer(int fd, void ***p, size_t n_buf);
 int v4l_stop(int fd);
 int v4l_start(int fd, size_t n_buf);
 int v4l_qbuf(int fd, int idx);
-int v4l_dqbuf(int fd);
+int v4l_dqbuf(int fd, size_t *len);
 int v4l_select(int fd, int timeout /* seconds */);
 int v4l_poll(int fd, int timeout /* milliseconds */);
 

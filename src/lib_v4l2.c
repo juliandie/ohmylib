@@ -225,7 +225,7 @@ int v4l_qbuf(int fd, int idx) {
     return 0;
 }
 
-int v4l_dqbuf(int fd) {
+int v4l_dqbuf(int fd, size_t *len) {
     struct v4l2_buffer buf = {
         .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
         .memory = V4L2_MEMORY_MMAP,
@@ -234,6 +234,17 @@ int v4l_dqbuf(int fd) {
     if(xioctl(fd, VIDIOC_DQBUF, &buf) < 0) {
         LIB_LOG_ERR("VIDIOC_DQBUF");
         return -1;
+    }
+
+    if(len) {
+#if 1
+        if(xioctl(fd, VIDIOC_QUERYBUF, &buf) < 0) {
+            LIB_LOG_ERR("VIDIOC_QUERYBUF");
+        }
+        *len = buf.length;
+#else
+        *len = buf.length;
+#endif
     }
 
     return buf.index;
@@ -250,21 +261,7 @@ int v4l_select(int fd, int timeout) {
     tv.tv_sec = timeout;
     tv.tv_usec = 0;
 
-    ret = select(fd + 1, &fds, NULL, NULL, &tv);
-    if(ret < 0) {
-        if(errno == EINTR)
-            return -1;
-
-        LIB_LOG_ERR("select");
-        return -1;
-    }
-
-    if(ret == 0) {
-        //LIB_LOG_INFO("select timeout");
-        return 0;
-    }
-
-    return ret;
+    return select(fd + 1, &fds, NULL, NULL, &tv);
 }
 
 int v4l_poll(int fd, int timeout) {
@@ -274,16 +271,5 @@ int v4l_poll(int fd, int timeout) {
     pfd.fd = fd;
     pfd.events = POLLIN;
 
-    ret = poll(&pfd, 1, timeout);
-    if(ret < 0) {
-        LIB_LOG_ERR("poll");
-        return -1;
-    }
-
-    if(ret == 0) {
-        LIB_LOG_INFO("poll timeout");
-        return 0;
-    }
-
-    return ret;
+    return poll(&pfd, 1, timeout);
 }
