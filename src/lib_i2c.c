@@ -24,7 +24,7 @@ int i2c_open_dev(const char *i2cdev) {
 }
 
 int i2c_open(uint32_t i2cnum) {
-    char i2cdev[32];
+    char i2cdev[20];
     snprintf(i2cdev, sizeof(i2cdev), "/dev/i2c-%u", i2cnum);
     return i2c_open_dev(i2cdev);
 }
