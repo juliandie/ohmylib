@@ -27,6 +27,17 @@ struct sockaddr {
     sa_family_t	sa_family;	/* address family, AF_xxx	*/
     char		sa_data[14];	/* 14 bytes of protocol address	*/
 };
+
+struct addrinfo {
+    int              ai_flags;
+    int              ai_family;
+    int              ai_socktype;
+    int              ai_protocol;
+    socklen_t        ai_addrlen;
+    struct sockaddr *ai_addr;
+    char            *ai_canonname;
+    struct addrinfo *ai_next;
+};
 #endif
 
 /**
