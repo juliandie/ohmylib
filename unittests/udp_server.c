@@ -9,7 +9,7 @@
 #include <lib_sock.h>
 #include <lib_log.h>
 
-static int server(int fd) {
+static int echo_server(int fd) {
     char host[NI_MAXHOST], service[NI_MAXSERV];
     struct sockaddr_storage peer_addr;
     socklen_t peer_addr_len;
@@ -67,22 +67,21 @@ int main(int argc, char **argv) {
         .ai_protocol = 0,          /* Any protocol */
     };
     struct addrinfo *res, *rp;
-    int ret, fd = 0;
+	int ret = 0, fd = 0;
 
     if(argc < 2) {
         fprintf(stderr, "Usage: %s <port>\n", argv[0]);
-        goto err;
+        goto out;
     }
 
     /* getaddrinfo() returns a list of address structures.
-     * Try each address until we successfully bind(2).
-     * If socket(2) (or bind(2)) fails, we (close the socket
-     * and) try the next address.
+     * Try each address until we successfully bind(2). If socket(2)
+     * (or bind(2)) fails, we (close the socket and) try the next address.
      */
     ret = getaddrinfo(NULL, argv[1], &hints, &res);
     if(ret != 0) {
         LIB_LOG_ERR("getaddrinfo: %s", gai_strerror(ret));
-        goto err;
+        goto out;
     }
 
     for(rp = res; rp != NULL; rp = rp->ai_next) {
@@ -100,14 +99,12 @@ int main(int argc, char **argv) {
 
     if(rp == NULL) { /* No address succeeded */
         LIB_LOG_ERR("bind: %s", strerror(errno));
-        goto err;
+        goto out;
     }
 
-    server(fd);
+    echo_server(fd);
 
     close(fd);
-    exit(EXIT_SUCCESS);
-
-err:
-    exit(EXIT_FAILURE);
+out:
+    return ret;
 }
