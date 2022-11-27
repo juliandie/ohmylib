@@ -36,7 +36,7 @@ void lib_hexdump(const void *p, size_t size, const char *fmt, ...);
 	{ fprintf(stderr, "[EMERG] %s "fmt"\n", __func__, ##__VA_ARGS__);}
 #endif
 #else
-#define LIB_LOG_EMERG(fmt, ...)
+#define LIB_LOG_EMERG(fmt, ...) {}
 #endif
 
 #if defined(LOG_LEVEL) && (LOG_LEVEL >= LOG_ALERT)
@@ -48,7 +48,7 @@ void lib_hexdump(const void *p, size_t size, const char *fmt, ...);
 	{ fprintf(stderr, "[ALERT] %s "fmt"\n", __func__, ##__VA_ARGS__);}
 #endif
 #else
-#define LIB_LOG_ALERT(fmt, ...)
+#define LIB_LOG_ALERT(fmt, ...) {}
 #endif
 
 #if defined(LOG_LEVEL) && (LOG_LEVEL >= LOG_CRIT)
@@ -60,7 +60,7 @@ void lib_hexdump(const void *p, size_t size, const char *fmt, ...);
 	{ fprintf(stderr, "[CRIT] %s "fmt"\n", __func__, ##__VA_ARGS__);}
 #endif
 #else
-#define LIB_LOG_CRIT(fmt, ...)
+#define LIB_LOG_CRIT(fmt, ...) {}
 #endif
 
 #if defined(LOG_LEVEL) && (LOG_LEVEL >= LOG_ERR)
@@ -72,7 +72,7 @@ void lib_hexdump(const void *p, size_t size, const char *fmt, ...);
 	{ fprintf(stderr, "[ERR] %s "fmt"\n", __func__, ##__VA_ARGS__);}
 #endif
 #else
-#define LIB_LOG_ERR(fmt, ...)
+#define LIB_LOG_ERR(fmt, ...) {}
 #endif
 
 #if defined(LOG_LEVEL) && (LOG_LEVEL >= LOG_WARNING)
@@ -84,7 +84,7 @@ void lib_hexdump(const void *p, size_t size, const char *fmt, ...);
 	{ fprintf(stderr, "[WARNING] %s "fmt"\n", __func__, ##__VA_ARGS__);}
 #endif
 #else
-#define LIB_LOG_WARNING(fmt, ...)
+#define LIB_LOG_WARNING(fmt, ...) {}
 #endif
 
 #if defined(LOG_LEVEL) && (LOG_LEVEL >= LOG_NOTICE)
@@ -96,7 +96,7 @@ void lib_hexdump(const void *p, size_t size, const char *fmt, ...);
 	{ fprintf(stderr, "[NOTICE] %s "fmt"\n", __func__, ##__VA_ARGS__);}
 #endif
 #else
-#define LIB_LOG_NOTICE(fmt, ...)
+#define LIB_LOG_NOTICE(fmt, ...) {}
 #endif
 
 #if defined(LOG_LEVEL) && (LOG_LEVEL >= LOG_INFO)
@@ -108,7 +108,7 @@ void lib_hexdump(const void *p, size_t size, const char *fmt, ...);
 	{ fprintf(stderr, "[INFO] %s "fmt"\n", __func__, ##__VA_ARGS__);}
 #endif
 #else
-#define LIB_LOG_INFO(fmt, ...)
+#define LIB_LOG_INFO(fmt, ...) {}
 #endif
 
 #if defined(LOG_LEVEL) && (LOG_LEVEL >= LOG_DEBUG)
@@ -128,7 +128,7 @@ void lib_hexdump(const void *p, size_t size, const char *fmt, ...);
 	  	__func__, __FILE__, __LINE__, ##__VA_ARGS__); }
 #endif
 #else
-#define LIB_LOG_DEBUG(fmt, ...)
+#define LIB_LOG_DEBUG(fmt, ...) {}
 #endif
 
 #endif

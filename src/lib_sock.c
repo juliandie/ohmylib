@@ -288,5 +288,8 @@ int lib_net_broadcast(int fd, bool enable) {
 }
 
 int lib_sock_bind_to_if(int fd, const char *ifname) {
-    return setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname));
+    struct ifreq ifr;
+    memset(&ifr, 0, sizeof(ifr));
+    snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), ifname);
+    return setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, &ifr, sizeof(ifr));
 }
