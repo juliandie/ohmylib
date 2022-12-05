@@ -128,6 +128,29 @@ int main() {
                     memcpy(&it_new, &it_old, sizeof(struct itimerspec));
             }
             break;
+        case 'i': // intervall
+            memset(&it_new, 0, sizeof(struct itimerspec));
+            it_new.it_interval.tv_sec = 5;
+            it_new.it_value.tv_sec = 5;
+            dump_itimerspec(&it_new, "\rnew");
+            ret = timer_settime(tid, 0, &it_new, NULL);
+            if(ret < 0)
+                fprintf(stderr, "failed to settime of timer (%d): %s\n",
+                        errno, strerror(errno));
+            else
+                printf("\rtimer setup interval\n");
+            break;
+        case 'n': // new
+            memset(&it_new, 0, sizeof(struct itimerspec));
+            it_new.it_value.tv_sec = 5;
+            dump_itimerspec(&it_new, "\rnew");
+            ret = timer_settime(tid, 0, &it_new, NULL);
+            if(ret < 0)
+                fprintf(stderr, "failed to settime of timer (%d): %s\n",
+                        errno, strerror(errno));
+            else
+                printf("\rtimer setup oneshot\n");
+            break;
         case 'r': // resume
             dump_itimerspec(&it_new, "\rnew");
             ret = timer_settime(tid, 0, &it_new, NULL);
@@ -142,12 +165,14 @@ int main() {
             if(ret < 0)
                 fprintf(stderr, "failed to gettime (%d): %s\n",
                         errno, strerror(errno));
-            else
+            else {
+                printf("timer_gettime(%d)\n", ret);
                 dump_itimerspec(&it_rem, "\rrem");
+            }
             break;
         case 'x': // expired
             ret = timer_getoverrun(tid);
-            if(ret < 0) 
+            if(ret < 0)
                 fprintf(stderr, "failed to get overrun (%d): %s\n",
                         errno, strerror(errno));
             else
