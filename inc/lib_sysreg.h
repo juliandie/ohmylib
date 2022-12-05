@@ -1,8 +1,8 @@
 #ifndef OHMYLIB_SYSREG_H_
 #define OHMYLIB_SYSREG_H_
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #define SYSREG_INFO_SIZE (112u)
 
