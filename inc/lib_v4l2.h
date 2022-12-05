@@ -19,8 +19,7 @@ int v4l_stop(int fd);
 int v4l_start(int fd, size_t n_buf);
 int v4l_qbuf(int fd, int idx);
 int v4l_dqbuf(int fd, size_t *len);
-int v4l_select(int fd, int timeout_seconds);
-int v4l_poll(int fd, int timeout_milliseconds);
+int v4l_poll(int fd, int timeout);
 
 #ifdef __cplusplus
 }

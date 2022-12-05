@@ -246,19 +246,6 @@ int v4l_dqbuf(int fd, size_t *len) {
     return buf.index;
 }
 
-int v4l_select(int fd, int timeout) {
-    struct timeval tv;
-    fd_set fds;
-
-    FD_ZERO(&fds);
-    FD_SET(fd, &fds);
-    /* Timeout. */
-    tv.tv_sec = timeout;
-    tv.tv_usec = 0;
-
-    return select(fd + 1, &fds, NULL, NULL, &tv);
-}
-
 int v4l_poll(int fd, int timeout) {
     struct pollfd pfd;
 
