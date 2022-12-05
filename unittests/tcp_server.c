@@ -49,7 +49,7 @@ static int server(int fd) {
     int ret, peer_fd;
 
     for(;;) {
-        ret = listen(fd, 1);
+        ret = listen(fd, 1); // accept only 1 conection at once
         if(ret < 0) {
             LIB_LOG_ERR("listen: %s", strerror(errno));
             continue;
