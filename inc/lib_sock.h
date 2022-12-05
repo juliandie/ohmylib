@@ -55,8 +55,6 @@ int lib_bind6(int fd, struct in6_addr *addr, __be16 port);
 
 int lib_port(int fd, __be16 *port);
 
-int lib_select(int fd, int timeout);
-int lib_poll(int fd, int timeout);
 int lib_recv(int fd, void *buf, size_t len, int flags);
 int lib_send(int fd, const void *buf, size_t len, int flags);
 int lib_sendto(int fd, const void *buf, size_t len, int flags,

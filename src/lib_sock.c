@@ -69,27 +69,6 @@ int lib_port(int fd, __be16 *port) {
     return ret;
 }
 
-int lib_select(int fd, int timeout) {
-    struct timeval tv;
-    fd_set fds;
-
-    FD_ZERO(&fds);
-    FD_SET(fd, &fds);
-    /* Timeout. */
-    tv.tv_sec = timeout;
-    tv.tv_usec = 0;
-
-    return select(fd + 1, &fds, NULL, NULL, &tv);
-}
-
-int lib_poll(int fd, int timeout) {
-    struct pollfd fds;
-
-    fds.fd = fd;
-    fds.events = POLLIN;
-    return poll(&fds, 1, timeout);
-}
-
 int lib_recv(int fd, void *buf, size_t len, int flags) {
     void *p = buf;
     size_t count = 0;
