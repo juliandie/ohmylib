@@ -41,23 +41,23 @@ int v4l_open(const char *videodev) {
 
     fd = open(videodev, O_RDWR /* required */ | O_NONBLOCK, 0);
     if(fd < 0) {
-        LIB_LOG_ERR("open: %s", strerror(errno));
+        //LIB_LOG_ERR("open: %s", strerror(errno));
         return -1;
     }
 
     memset(&cap, 0, sizeof(struct v4l2_capability));
     if(xioctl(fd, VIDIOC_QUERYCAP, &cap) < 0) {
-        LIB_LOG_ERR("VIDIOC_QUERYCAP: %s", strerror(errno));
+        //LIB_LOG_ERR("VIDIOC_QUERYCAP: %s", strerror(errno));
         goto close_fd;
     }
 
     if(!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
-        LIB_LOG_WARNING("%s is no video capture device", videodev);
+        //LIB_LOG_WARNING("%s is no video capture device", videodev);
         goto close_fd;
     }
 
     if(!(cap.capabilities & V4L2_CAP_STREAMING)) {
-        LIB_LOG_WARNING("%s does not support streaming i/o", videodev);
+        //LIB_LOG_WARNING("%s does not support streaming i/o", videodev);
         goto close_fd;
     }
 
@@ -76,7 +76,7 @@ int v4l_set_format(int fd, struct v4l2_pix_format *format) {
     memcpy(&fmt.fmt, format, sizeof(struct v4l2_pix_format));
 
     if(xioctl(fd, VIDIOC_S_FMT, &fmt) < 0) {
-        LIB_LOG_ERR("VIDIOC_S_FMT");
+        //LIB_LOG_ERR("VIDIOC_S_FMT");
         return -1;
     }
 
@@ -90,7 +90,7 @@ int v4l_get_format(int fd, struct v4l2_pix_format *format) {
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
     if(xioctl(fd, VIDIOC_G_FMT, &fmt) < 0) {
-        LIB_LOG_ERR("VIDIOC_G_FMT");
+        //LIB_LOG_ERR("VIDIOC_G_FMT");
         return -1;
     }
 
@@ -116,12 +116,12 @@ void v4l_munmap_buffer(int fd, void ***p, size_t n_buf) {
         buf.index = i;
 
         if(xioctl(fd, VIDIOC_QUERYBUF, &buf) < 0) {
-            LIB_LOG_ERR("VIDIOC_QUERYBUF: %s", strerror(errno));
+            //LIB_LOG_ERR("VIDIOC_QUERYBUF: %s", strerror(errno));
             continue;
         }
 
         if(munmap(ptr[i], buf.length) < 0)
-            LIB_LOG_ERR("munmap failed: %s", strerror(errno));
+            //LIB_LOG_ERR("munmap failed: %s", strerror(errno));
     }
 
     free(*p);
@@ -139,7 +139,7 @@ int v4l_mmap_buffer(int fd, void ***p, size_t n_buf) {
     req.memory = V4L2_MEMORY_MMAP;
 
     if(xioctl(fd, VIDIOC_REQBUFS, &req) < 0) {
-        LIB_LOG_ERR("VIDIOC_REQBUFS: %s", strerror(errno));
+        //LIB_LOG_ERR("VIDIOC_REQBUFS: %s", strerror(errno));
         return -1;
     }
 
@@ -161,7 +161,7 @@ int v4l_mmap_buffer(int fd, void ***p, size_t n_buf) {
         buf.index = i;
 
         if(xioctl(fd, VIDIOC_QUERYBUF, &buf) < 0) {
-            LIB_LOG_ERR("VIDIOC_QUERYBUF");
+            //LIB_LOG_ERR("VIDIOC_QUERYBUF");
             goto free_buffer;
         }
 
@@ -169,7 +169,7 @@ int v4l_mmap_buffer(int fd, void ***p, size_t n_buf) {
                         MAP_SHARED, fd, buf.m.offset);
 
         if(MAP_FAILED == ptr[i]) {
-            LIB_LOG_ERR("mmap failed: %s", strerror(errno));
+            //LIB_LOG_ERR("mmap failed: %s", strerror(errno));
             goto free_buffer;
         }
     }
@@ -237,14 +237,10 @@ int v4l_dqbuf(int fd, size_t *len) {
     }
 
     if(len) {
-#if 1
         if(xioctl(fd, VIDIOC_QUERYBUF, &buf) < 0) {
             LIB_LOG_ERR("VIDIOC_QUERYBUF");
         }
         *len = buf.length;
-#else
-        *len = buf.length;
-#endif
     }
 
     return buf.index;
