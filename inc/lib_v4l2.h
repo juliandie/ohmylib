@@ -3,7 +3,6 @@
 
 #include <stdint.h> // size_t
 #include <linux/videodev2.h>
-#include <lib_buffer.h>
 
 #ifdef __cplusplus
 extern "C" {
