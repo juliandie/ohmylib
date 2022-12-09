@@ -56,7 +56,7 @@ int lib_bind6(int fd, struct in6_addr *addr, __be16 port) {
     return bind(fd, (struct sockaddr *)&sa, sizeof(struct sockaddr));
 }
 
-int lib_port(int fd, __be16 *port) {
+int lib_get_port(int fd, __be16 *port) {
     socklen_t addrlen = sizeof(struct sockaddr_in);
     struct sockaddr_in sa;
     int ret;
@@ -70,12 +70,15 @@ int lib_port(int fd, __be16 *port) {
 }
 
 int lib_recv(int fd, void *buf, size_t len, int flags) {
+    struct pollfd fds;
     void *p = buf;
     size_t count = 0;
     int ret = 0;
-
+    
+    fds.fd = fd;
+    fds.events = POLLIN;
     while(count < len) {
-        ret = lib_poll(fd, 1000);
+        ret = poll(&fds, 1, 1000);
         if(ret < 0)
             return -1;
 
@@ -228,42 +231,66 @@ int lib_sock_reuseaddr(int fd) {
     return lib_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, 1);
 }
 
-int lib_sock_mtu_discover(int fd) {
+/**
+ * IP_TOS		    ( 1)
+ * IP_TTL		    ( 2)
+ * IP_HDRINCL	    ( 3)
+ * IP_OPTIONS	    ( 4)
+ * IP_ROUTER_ALERT	( 5)
+ * IP_RECVOPTS	    ( 6)
+ * IP_RETOPTS	    ( 7)
+ * IP_PKTINFO	    ( 8)
+ * IP_PKTOPTIONS	( 9)
+ * IP_MTU_DISCOVER	(10)
+ * IP_RECVERR	    (11)
+ * IP_RECVTTL	    (12)
+ *	IP_RECVTOS	    (13)
+ * IP_MTU		    (14)
+ * IP_FREEBIND	    (15)
+ * IP_IPSEC_POLICY	(16)
+ * IP_XFRM_POLICY	(17)
+ * IP_PASSSEC	    (18)
+ * IP_TRANSPARENT	(19)
+ */
+
+// see IP_MTU_DISCOVER values (linux/in.h)
+int lib_sock_get_mtu_discover(int fd) {
     return lib_getsockopt(fd, SOL_IP, IP_MTU_DISCOVER);
 }
 
-int lib_sock_mtu_discover_want(int fd) {
-    return lib_setsockopt(fd, SOL_IP, IP_MTU_DISCOVER, IP_PMTUDISC_WANT);
+int lib_sock_set_mtu_discover_want(int fd, int mtu_discover) {
+    return lib_setsockopt(fd, SOL_IP, IP_MTU_DISCOVER, mtu_discover);
 }
 
-int lib_sock_mtu_discover_dont(int fd) { // do fragment?
-    return lib_setsockopt(fd, SOL_IP, IP_MTU_DISCOVER, IP_PMTUDISC_DONT);
-}
-
-int lib_sock_mtu_discover_do(int fd) { // don't fragment?
-    return lib_setsockopt(fd, SOL_IP, IP_MTU_DISCOVER, IP_PMTUDISC_DO);
-}
-
-int lib_sock_mtu_discover_probe(int fd) {
-    return lib_setsockopt(fd, SOL_IP, IP_MTU_DISCOVER, IP_PMTUDISC_PROBE);
-}
-
-int lib_sock_mtu(int fd) {
+int lib_sock_get_mtu(int fd) {
     return lib_getsockopt(fd, SOL_IP, IP_MTU);
 }
 
-int lib_sock_pktinfo(int fd, bool enable) {
-    if(enable)
-        return lib_setsockopt(fd, SOL_IP, IP_PKTINFO, 1);
-    else
-        return lib_setsockopt(fd, SOL_IP, IP_PKTINFO, 0);
+int lib_sock_get_pktinfo(int fd, int enable) {
+    return lib_setsockopt(fd, SOL_IP, IP_PKTINFO, enable ? 1 : 0);
 }
 
-int lib_net_broadcast(int fd, bool enable) {
-    if(enable)
-        return lib_setsockopt(fd, SOL_SOCKET, SO_BROADCAST, 1);
-    else
-        return lib_setsockopt(fd, SOL_SOCKET, SO_BROADCAST, 0);
+/**
+ * SO_DEBUG	        ( 1)
+ * SO_REUSEADDR	    ( 2)
+ * SO_TYPE		    ( 3)
+ * SO_ERROR	        ( 4)
+ * SO_DONTROUTE	    ( 5)
+ * SO_BROADCAST	    ( 6)
+ * SO_SNDBUF	    ( 7)
+ * SO_RCVBUF	    ( 8)
+ * SO_SNDBUFFORCE	(32)
+ * SO_RCVBUFFORCE	(33)
+ * SO_KEEPALIVE	    ( 9)
+ * SO_OOBINLINE	    (10)
+ * SO_NO_CHECK	    (11)
+ * SO_PRIORITY	    (12)
+ * SO_LINGER	    (13)
+ * SO_BSDCOMPAT	    (14)
+ * SO_REUSEPORT	    (15)
+ */
+int lib_net_get_broadcast(int fd, int enable) {
+    return lib_setsockopt(fd, SOL_SOCKET, SO_BROADCAST, enable ? 1 : 0);
 }
 
 int lib_sock_bind_to_if(int fd, const char *ifname) {
