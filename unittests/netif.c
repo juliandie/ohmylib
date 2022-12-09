@@ -12,7 +12,7 @@
 #include <lib_log.h>
 
 static void netif_dmp(const char* ifname) {
-    uint8_t mac[6] = {};
+    struct if_hwaddr hwaddr;
     struct in_addr addr;
     uint32_t spd, mtu;
     int cnt;
@@ -25,10 +25,9 @@ static void netif_dmp(const char* ifname) {
     cnt = lib_netif_adr_cnt(ifname);
     for (int i = 0; i < cnt; i++) {
 
-        lib_netif_hwaddr(ifname, mac);
-        printf("%s(%d) (%d - %02x:%02x:%02x:%02x:%02x:%02x)\n",
-            ifname, i, lib_netif_idx(ifname),
-            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+        lib_netif_hwaddr(ifname, &hwaddr);
+        printf("%s(%d) (%d - %s)\n",
+            ifname, i, lib_netif_idx(ifname), lib_hwaddrtos(&hwaddr));
         addr.s_addr = htonl(lib_netif_adr_idx(ifname, i));
         printf("    adr: %s\n", inet_ntoa(addr));
         addr.s_addr = htonl(lib_netif_dst_idx(ifname, i));

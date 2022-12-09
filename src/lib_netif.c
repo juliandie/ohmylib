@@ -64,6 +64,25 @@ int lib_netif_hwaddr(const char *ifname, struct if_hwaddr *addr) {
     return 0;
 }
 
+static char hwaddrs[19];
+const char *lib_hwaddrtos(struct if_hwaddr *addr) {
+    if(!addr)
+        return NULL;
+
+    memset(hwaddrs, 0, sizeof(hwaddrs));
+
+    snprintf(hwaddrs, sizeof(hwaddrs) - 1,
+             "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
+             addr->mac[0],
+             addr->mac[1],
+             addr->mac[2],
+             addr->mac[3],
+             addr->mac[4],
+             addr->mac[5]);
+
+    return hwaddrs;
+}
+
 int lib_netif_has_adr(const char *ifname, const struct sockaddr_in *ina) {
     struct ifaddrs *ifaddr, *ifa;
     int ret = 0;
@@ -849,6 +868,10 @@ int lib_netif_interfaces(char ***ifnames) {
 
     for(ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
         int skip = 0;
+
+        if(ifa->ifa_addr == NULL)
+            continue;
+
         if(ifa->ifa_addr->sa_family == AF_INET) {
             for(int i = 0; (buf)[i] != NULL; i++) {
                 if(!strcmp((buf)[i], ifa->ifa_name))

@@ -4,7 +4,6 @@
 
 //#include <stdint.h> /** uint_* */
 #include <arpa/inet.h>
-#include <lib_buffer.h>
 #include <net/ethernet.h>
 //#include <net/if_arp.h>
 //#include <netinet/if_ether.h>
@@ -15,6 +14,7 @@ struct if_hwaddr {
 
 /** MAC */
 int lib_netif_hwaddr(const char *ifname, struct if_hwaddr *addr);
+const char *lib_hwaddrtos(struct if_hwaddr *addr);
 /** IP */
 int lib_netif_has_adr(const char *ifname, const struct sockaddr_in *ina);
 int lib_netif_adr_cnt(const char *ifname);
