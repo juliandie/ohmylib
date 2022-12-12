@@ -1,12 +1,6 @@
 #include <lib_time.h>
-#include <stdio.h>
-#include <stdint.h> // uint*_t
-#include <stdlib.h> // malloc, free
-#include <string.h> // memset
-#include <unistd.h> // usleep
-#include <errno.h>
-#include <time.h> // timer_*, nanosleep
-#include <sys/time.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <signal.h>
 
 int lib_timestamp_create(timer_t *tid) {
