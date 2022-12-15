@@ -1,4 +1,3 @@
-
 #include <sys/types.h>
 #include <ifaddrs.h>
 #include <stdlib.h>
@@ -14,7 +13,6 @@
 static void netif_dmp(const char* ifname) {
     struct if_hwaddr hwaddr;
     struct in_addr addr;
-    uint32_t spd, mtu;
     int cnt;
 
     addr.s_addr = htonl(lib_netif_def_gtw(ifname));
@@ -24,7 +22,7 @@ static void netif_dmp(const char* ifname) {
 
     cnt = lib_netif_adr_cnt(ifname);
     for (int i = 0; i < cnt; i++) {
-
+        uint32_t spd, mtu;
         lib_netif_hwaddr(ifname, &hwaddr);
         printf("%s(%d) (%d - %s)\n",
             ifname, i, lib_netif_idx(ifname), lib_hwaddrtos(&hwaddr));
