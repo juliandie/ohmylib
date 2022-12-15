@@ -50,11 +50,11 @@ libohmylib.so: $(C_OBJ)
 unittests:
 	$(MAKE) -C unittests
 
-# Skeleton for subdir.mk
+# Skeleton for subdir.mk, replace "%" with "relative/path/%"
 %.c.o: ./%.c ./%.h
 	$(CC) $(CFLAGS) -c $< -o $@
 	
-# Skeleton for subdir.mk
+# Skeleton for subdir.mk, replace "%" with "relative/path/%"
 %.c.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
