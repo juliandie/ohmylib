@@ -67,9 +67,9 @@ static int capture_open(struct capture_s *cap) {
     }
 
     LIB_LOG_INFO("%ux%u (0x%08x, %.4s)",
-                 cap->format.width, 
+                 cap->format.width,
                  cap->format.height,
-                 cap->format.pixelformat, 
+                 cap->format.pixelformat,
                  (char *)&cap->format.pixelformat);
 
     ret = v4l_mmap_buffer(cap->videofd, &cap->buffer, 4);
@@ -98,7 +98,7 @@ static int capture_store(struct capture_s *cap, const void *buf, size_t count) {
     int fd, ret;
     size_t size = 0;
 
-    if(snprintf(fn, sizeof(fn), "frame-%06d.bin", cap->t_frames) < 0)
+    if(snprintf(fn, sizeof(fn), "frame-%06u.bin", cap->t_frames) < 0)
         goto err;
 
     fd = open(fn, O_RDWR | O_CREAT);
@@ -106,7 +106,7 @@ static int capture_store(struct capture_s *cap, const void *buf, size_t count) {
         goto err;
 
     while(size < count) {
-        ret = write(fd, buf + size, count - size);
+        ret = write(fd, (char *)buf + size, count - size);
         if(ret < 0)
             goto err_close;
 
@@ -175,13 +175,13 @@ static void *capture_thread(void *arg) {
 
         clock_gettime(CLOCK_REALTIME, &tp[1]);
         elapsed = ((tp[1].tv_sec * 1000000000ul) + tp[1].tv_nsec) -
-                  ((tp[0].tv_sec * 1000000000ul) + tp[0].tv_nsec);
+            ((tp[0].tv_sec * 1000000000ul) + tp[0].tv_nsec);
         memcpy(&tp[0], &tp[1], sizeof(struct timespec));
 
         buf = cap->buffer[buf_idx];
 
         if(cap->show_fps) {
-            printf("[f %d/%d] [%.1f FPS] %zuB", cap->n_frames, cap->t_frames,
+            printf("[f %u/%u] [%.1f FPS] %zuB", cap->n_frames, cap->t_frames,
                    (1.0f / (elapsed / 1000000000)), len);
         }
 
@@ -223,7 +223,7 @@ int main(int argc, char **argv) {
 
     memset(&cap, 0, sizeof(struct capture_s));
     cap.videodev = "/dev/video0";
-    
+
     ret = pthread_mutex_init(&cap.lock, NULL);
     if(ret < 0) {
         LIB_LOG_ERR("failed to init mutex");
@@ -236,7 +236,7 @@ int main(int argc, char **argv) {
 
     getchar_once();
     usage();
-    
+
     for(;;) {
         int c = fgetc(stdin); // don't use getchar tho!
 
