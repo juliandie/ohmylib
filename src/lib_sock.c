@@ -73,11 +73,11 @@ int lib_recv(int fd, void *buf, size_t len, int flags) {
     struct pollfd fds;
     void *p = buf;
     size_t count = 0;
-    int ret = 0;
-    
+
     fds.fd = fd;
     fds.events = POLLIN;
     while(count < len) {
+        int ret;
         ret = poll(&fds, 1, 1000);
         if(ret < 0)
             return -1;
@@ -94,7 +94,7 @@ int lib_recv(int fd, void *buf, size_t len, int flags) {
             return count;
 
         count += (size_t)ret;
-        p += ret;
+        p = (char *)p + ret;
     }
 
     return count;
@@ -170,9 +170,9 @@ err:
 int lib_send(int fd, const void *buf, size_t len, int flags) {
     const void *p = buf;
     size_t count = 0;
-    int ret = 0;
 
     while(count < len) {
+        int ret;
         ret = send(fd, p, len - count, flags);
         if(ret < 0)
             return -1;
@@ -181,7 +181,7 @@ int lib_send(int fd, const void *buf, size_t len, int flags) {
             return count;
 
         count += (size_t)ret;
-        p += ret;
+        p = (char *)p + ret;
     }
 
     return count;
@@ -191,9 +191,9 @@ int lib_sendto(int fd, const void *buf, size_t len, int flags,
                const struct sockaddr *dest_addr, socklen_t addrlen) {
     const void *p = buf;
     size_t count = 0;
-    int ret = 0;
 
     while(count < len) {
+        int ret;
         ret = sendto(fd, p, len - count, flags, dest_addr, addrlen);
         if(ret < 0)
             return -1;
@@ -202,19 +202,21 @@ int lib_sendto(int fd, const void *buf, size_t len, int flags,
             return count;
 
         count += (size_t)ret;
-        p += ret;
+        p = (char *)p + ret;
     }
 
     return count;
 }
 
 int lib_flush(int fd, uint32_t udelay) {
-    int ret, queue;
+    int queue;
 
     if(udelay == 0)
         udelay = 1;
 
     do {
+        int ret;
+
         ret = ioctl(fd, TIOCOUTQ, &queue);
         if(ret != 0)
             return -1;
