@@ -45,6 +45,7 @@ libohmylib.a: $(C_OBJ)
 	$(AR) rcs $@ $^
 
 libohmylib.so: $(C_OBJ)
+	$(CC) $(CFLAGS) -fPIC -shared $^ $(LLINK) -o $@
 
 unittests:
 	$(MAKE) -C unittests
