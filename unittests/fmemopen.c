@@ -8,7 +8,6 @@
 
 int main(int argc, char *argv[]) {
     FILE *out, *in;
-    int v, s;
     size_t size;
     char *ptr;
 
@@ -26,6 +25,7 @@ int main(int argc, char *argv[]) {
         handle_error("open_memstream");
 
     for(;;) {
+        int v, s;
         s = fscanf(in, "%d", &v);
         if(s <= 0)
             break;
