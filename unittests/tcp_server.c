@@ -46,9 +46,9 @@ static int server(int fd) {
     char host[NI_MAXHOST], service[NI_MAXSERV];
     struct sockaddr_storage peer_addr;
     socklen_t peer_addr_len;
-    int ret, peer_fd;
 
     for(;;) {
+        int ret, peer_fd;
         ret = listen(fd, 1); // accept only 1 conection at once
         if(ret < 0) {
             LIB_LOG_ERR("listen: %s", strerror(errno));
