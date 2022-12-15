@@ -1,6 +1,6 @@
 
-#ifndef LIB_NETIF_H_
-#define LIB_NETIF_H_
+#ifndef OHMYLIB_NETIF_H_
+#define OHMYLIB_NETIF_H_
 
 //#include <stdint.h> /** uint_* */
 #include <arpa/inet.h>
@@ -9,7 +9,7 @@
 //#include <netinet/if_ether.h>
 
 struct if_hwaddr {
-    char mac[ETH_ALEN];
+    uint8_t mac[ETH_ALEN];
 };
 
 /** MAC */
