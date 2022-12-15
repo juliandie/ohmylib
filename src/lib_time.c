@@ -12,9 +12,9 @@ int lib_timestamp_create(timer_t *tid) {
 }
 
 int lib_timestamp_start(timer_t tid) {
-    struct itimerspec it_new = { 
-        .it_interval = { .tv_sec = INT32_MAX, .tv_nsec = 0 },
-        .it_value = { .tv_sec = INT32_MAX, .tv_nsec = 0 }
+    struct itimerspec it_new = {
+        .it_interval = {.tv_sec = INT32_MAX, .tv_nsec = 0 },
+        .it_value = {.tv_sec = INT32_MAX, .tv_nsec = 0 }
     };
     return timer_settime(tid, 0, &it_new, NULL);
 }
@@ -30,16 +30,16 @@ int lib_timestamp_stop(timer_t tid, struct itimerspec *it_old) {
 }
 
 int lib_timestamp_elapsed(timer_t tid, struct itimerspec *it_elapsed) {
-    ldiv_t ldiv_val;
-    uint64_t nsec;
-
     if(timer_gettime(tid, it_elapsed) < 0)
         return -1;
 
     // timer_gettime should return EFAULT whenn it == NULL
     if(it_elapsed) {
+        ldiv_t ldiv_val;
+        uint64_t nsec;
+
         nsec = ((uint64_t)INT32_MAX * 1000000000) -
-            ((it_elapsed->it_value.tv_sec * 1000000000) + 
+            ((it_elapsed->it_value.tv_sec * 1000000000) +
              it_elapsed->it_value.tv_nsec);
         ldiv_val = ldiv(nsec, 1000000000);
         it_elapsed->it_value.tv_sec = ldiv_val.quot;
