@@ -1,4 +1,3 @@
-
 #include <lib_log.h>
 
 #include <stdarg.h> // va_start, va_end
@@ -6,10 +5,9 @@
 void lib_dump(const void *p, size_t size, const char *fmt, ...) {
     char *buf;
     size_t len;
-    va_list ap;
-    int i;
 
     if(fmt != NULL) {
+        va_list ap;
         va_start(ap, fmt);
         vprintf(fmt, ap);
         va_end(ap);
@@ -17,7 +15,7 @@ void lib_dump(const void *p, size_t size, const char *fmt, ...) {
     }
 
     printf("   ");
-    for(i = 0; i < 16; i++) {
+    for(int i = 0; i < 16; i++) {
         printf("%02x ", i);
     }
     printf("\n");
@@ -47,10 +45,9 @@ void lib_dump(const void *p, size_t size, const char *fmt, ...) {
 void lib_hexdump(const void *p, size_t size, const char *fmt, ...) {
     char *hbuf, *cbuf;
     size_t hlen, tlen;
-    va_list ap;
-    int i;
 
     if(fmt != NULL) {
+        va_list ap;
         va_start(ap, fmt);
         vprintf(fmt, ap);
         va_end(ap);
@@ -58,7 +55,7 @@ void lib_hexdump(const void *p, size_t size, const char *fmt, ...) {
     }
 
     printf("   ");
-    for(i = 0; i < 16; i++) {
+    for(int i = 0; i < 16; i++) {
         printf("%02x ", i);
     }
     printf("\n");
