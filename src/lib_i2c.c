@@ -1,23 +1,12 @@
-
+#include <lib_i2c.h>
+#include <stdio.h>
+#include <string.h>
 #include <linux/i2c-dev.h>
 #include <linux/i2c.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/ioctl.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdarg.h>
-#include <getopt.h>
-#include <errno.h>
-#include <pthread.h>
-#include <poll.h>
-#include <signal.h>
-#include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 
 int i2c_open_dev(const char *i2cdev) {
     return open(i2cdev, O_RDWR);
@@ -34,7 +23,7 @@ int i2c_xfer(int fd, uint16_t addr,
              uint8_t *rx, size_t rx_len) {
     struct i2c_rdwr_ioctl_data msg;
     struct i2c_msg i2cmsg[2];
-    unsigned int i2cmsgn = 0;
+    uint32_t i2cmsgn = 0;
 
     memset(&msg, 0, sizeof(msg));
     memset(i2cmsg, 0, sizeof(i2cmsg));
