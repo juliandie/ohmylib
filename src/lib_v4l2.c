@@ -104,12 +104,12 @@ void v4l_munmap_buffer(int fd, void ***p, size_t n_buf) {
 
     if(!fd || !p || !n_buf)
         return;
-    
+
     ptr = *p;
 
     for(int i = 0; i < (int)n_buf; i++) {
         struct v4l2_buffer buf;
-        
+
         memset(&buf, 0, sizeof(struct v4l2_buffer));
         buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         buf.memory = V4L2_MEMORY_MMAP;
@@ -120,8 +120,9 @@ void v4l_munmap_buffer(int fd, void ***p, size_t n_buf) {
             continue;
         }
 
-        if(munmap(ptr[i], buf.length) < 0)
+        if(munmap(ptr[i], buf.length) < 0) {
             //LIB_LOG_ERR("munmap failed: %s", strerror(errno));
+        }
     }
 
     free(*p);
@@ -131,7 +132,8 @@ void v4l_munmap_buffer(int fd, void ***p, size_t n_buf) {
 int v4l_mmap_buffer(int fd, void ***p, size_t n_buf) {
     struct v4l2_requestbuffers req;
     void **ptr;
-    size_t ret, i;
+    size_t i;
+    int ret;
 
     memset(&req, 0, sizeof(struct v4l2_requestbuffers));
     req.count = n_buf;
@@ -148,9 +150,11 @@ int v4l_mmap_buffer(int fd, void ***p, size_t n_buf) {
         return -1;
     }
 
-    ptr = calloc(req.count, sizeof(void *));
-    if(!ptr) 
+    ptr = calloc(req.count + 1, sizeof(void *));
+    if(!ptr)
         return -1;
+
+    memset(ptr, 0, (req.count + 1) * sizeof(void *));
 
     for(i = 0; i < req.count; i++) {
         struct v4l2_buffer buf;
@@ -165,8 +169,8 @@ int v4l_mmap_buffer(int fd, void ***p, size_t n_buf) {
             goto free_buffer;
         }
 
-        ptr[i] = mmap(NULL, buf.length, PROT_READ | PROT_WRITE, 
-                        MAP_SHARED, fd, buf.m.offset);
+        ptr[i] = mmap(NULL, buf.length, PROT_READ | PROT_WRITE,
+                      MAP_SHARED, fd, buf.m.offset);
 
         if(MAP_FAILED == ptr[i]) {
             //LIB_LOG_ERR("mmap failed: %s", strerror(errno));
