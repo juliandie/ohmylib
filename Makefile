@@ -33,7 +33,6 @@ LDFLAGS += -Wl,--start-group $(LIBRARIES:%=-l%) -Wl,--end-group
 -include cppcheck.mk
 
 C_SRC := $(wildcard $(SRC_DIR)/*.c)
-C_HDR := $(wildcard $(SRC_DIR)/*.h)
 -include src/subdir.mk
 
 C_OBJ := $(C_SRC:%.c=%.c.o)
