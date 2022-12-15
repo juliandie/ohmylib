@@ -12,10 +12,10 @@
 static volatile int run = 1;
 
 static int client(int fd, int argc, char **argv) {
-    ssize_t nread, len;
     char buf[1500];
-    
+
     for(int j = 3; j < argc; j++) {
+        ssize_t nread, len;
         len = strlen(argv[j]) + 1;
 
         if(len > (ssize_t)sizeof(buf)) {
@@ -36,6 +36,7 @@ static int client(int fd, int argc, char **argv) {
 
         printf("Received %zd bytes: %s\n", nread, buf);
     }
+
     return 0;
 }
 
@@ -47,7 +48,7 @@ int main(int argc, char **argv) {
         .ai_protocol = 0,          /* Any protocol */
     };
     struct addrinfo *res, *rp;
-	int ret = 0, fd = 0;
+    int ret = 0, fd = 0;
 
     if(argc < 3) {
         fprintf(stderr, "Usage: %s <host> <port> <msg>\n", argv[0]);
@@ -60,7 +61,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(ret));
         goto out;
     }
-	
+
     /* getaddrinfo() returns a list of address structures.
      * Try each address until we successfully bind(2). If socket(2)
      * (or bind(2)) fails, we (close the socket and) try the next address.
@@ -83,7 +84,7 @@ int main(int argc, char **argv) {
         goto out;
     }
 
-	client(fd, argc, argv);
+    client(fd, argc, argv);
 
     close(fd);
 out:

@@ -15,9 +15,9 @@ static int echo_server(int fd) {
     socklen_t peer_addr_len;
     ssize_t nread;
     char buf[1500];
-    int ret;
 
     for(;;) {
+        int ret;
         ret = lib_poll(fd, 1000);
         if(ret < 0) {
             LIB_LOG_ERR("poll: %s", strerror(errno));
