@@ -1,4 +1,4 @@
-variableScope:*
-shadowVariable:*
+#variableScope:*
+#shadowVariable:*
 unusedFunction:*
 missingInclude:*
