@@ -1,6 +1,6 @@
 
-#ifndef UDP_SOCK_H_
-#define UDP_SOCK_H_
+#ifndef OHMYLIB_SOCK_H_
+#define OHMYLIB_SOCK_H_
 
 #include <linux/types.h> // __be16, __be32
 #include <stdint.h>

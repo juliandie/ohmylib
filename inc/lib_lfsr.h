@@ -1,5 +1,5 @@
-#ifndef LIB_LFSR_H_
-#define LIB_LFSR_H_
+#ifndef OHMYLIB_LFSR_H_
+#define OHMYLIB_LFSR_H_
 
 #include <stdint.h>
 #include <stddef.h>

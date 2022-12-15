@@ -1,5 +1,5 @@
-#ifndef LIB_SELECT_H_
-#define LIB_SELECT_H_
+#ifndef OHMYLIB_SELECT_H_
+#define OHMYLIB_SELECT_H_
 
 #include <sys/select.h>
 

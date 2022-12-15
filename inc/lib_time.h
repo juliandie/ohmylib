@@ -1,5 +1,5 @@
-#ifndef LIB_TIME_H_
-#define LIB_TIME_H_
+#ifndef OHMYLIB_TIME_H_
+#define OHMYLIB_TIME_H_
 
 #include <time.h> // timer_t
 

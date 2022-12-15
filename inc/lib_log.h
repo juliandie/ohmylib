@@ -1,6 +1,6 @@
 
-#ifndef LIB_LOG_H_
-#define LIB_LOG_H_
+#ifndef OHMYLIB_LOG_H_
+#define OHMYLIB_LOG_H_
 
 #include <stdio.h>  // printf
 #include <string.h> // strerror
