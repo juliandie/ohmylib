@@ -867,12 +867,12 @@ int lib_netif_interfaces(char ***ifnames) {
     buf = calloc(n, sizeof(char *));
 
     for(ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-        int skip = 0;
-
         if(ifa->ifa_addr == NULL)
             continue;
 
         if(ifa->ifa_addr->sa_family == AF_INET) {
+            int skip = 0;
+
             for(int i = 0; (buf)[i] != NULL; i++) {
                 if(!strcmp((buf)[i], ifa->ifa_name))
                     skip = 1;
