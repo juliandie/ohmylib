@@ -42,7 +42,7 @@ all: $(UNITTESTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LLINK) -o $@
 	
 ohmylib: 
-	$(MAKE) -C ../
+	$(MAKE) -C ../ libohmylib.a
 	
 PHONY += cppcheck
 cppcheck:
