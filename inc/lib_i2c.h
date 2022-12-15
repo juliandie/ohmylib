@@ -1,8 +1,8 @@
 #ifndef OHMYLIB_I2C_H_
 #define OHMYLIB_I2C_H_
 
+#include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
 
 int i2c_open_dev(const char *i2cdev);
 int i2c_open(uint32_t i2cnum);
