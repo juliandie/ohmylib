@@ -68,19 +68,23 @@ int main(int argc, char **argv) {
     };
     struct addrinfo *res, *rp;
 	int ret = 0, fd = 0;
+    char *service = NULL;
+    __be16 port;
 
     if(argc < 2) {
         fprintf(stderr, "Usage: %s <port>\n", argv[0]);
-        goto out;
+        //goto out;
     }
+    else
+        service = argv[1];
 
     /* getaddrinfo() returns a list of address structures.
-     * Try each address until we successfully bind(2). If socket(2)
-     * (or bind(2)) fails, we (close the socket and) try the next address.
-     */
-    ret = getaddrinfo(NULL, argv[1], &hints, &res);
+        * Try each address until we successfully bind(2). If socket(2)
+        * (or bind(2)) fails, we (close the socket and) try the next address.
+        */
+    ret = getaddrinfo("0.0.0.0", service, &hints, &res);
     if(ret != 0) {
-        LIB_LOG_ERR("getaddrinfo: %s", gai_strerror(ret));
+        LIB_LOG_ERR("getaddrinfo (%d): %s", ret, gai_strerror(ret));
         goto out;
     }
 
@@ -100,6 +104,14 @@ int main(int argc, char **argv) {
     if(rp == NULL) { /* No address succeeded */
         LIB_LOG_ERR("bind: %s", strerror(errno));
         goto out;
+    }
+
+    if(!service) {
+        if(lib_get_port(fd, &port) < 0) {
+            LIB_LOG_ERR("lib_get_port");
+        }
+        else
+            LIB_LOG_INFO("port: %d", ntohs(port));
     }
 
     echo_server(fd);
