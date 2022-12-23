@@ -86,9 +86,9 @@ int lib_sock_reuseaddr(int fd);
 int lib_sock_get_mtu_discover(int fd);
 int lib_sock_set_mtu_discover_want(int fd, int mtu_discover);
 int lib_sock_get_mtu(int fd);
-int lib_sock_get_pktinfo(int fd, int enable);
+int lib_sock_set_pktinfo(int fd, int enable);
 
-int lib_net_get_broadcast(int fd, int enable);
+int lib_net_set_broadcast(int fd, int enable);
 int lib_sock_bind_to_if(int fd, const char *ifname);
 
 #endif

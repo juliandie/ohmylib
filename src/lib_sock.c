@@ -268,7 +268,7 @@ int lib_sock_get_mtu(int fd) {
     return lib_getsockopt(fd, SOL_IP, IP_MTU);
 }
 
-int lib_sock_get_pktinfo(int fd, int enable) {
+int lib_sock_set_pktinfo(int fd, int enable) {
     return lib_setsockopt(fd, SOL_IP, IP_PKTINFO, enable ? 1 : 0);
 }
 
@@ -291,7 +291,7 @@ int lib_sock_get_pktinfo(int fd, int enable) {
  * SO_BSDCOMPAT	    (14)
  * SO_REUSEPORT	    (15)
  */
-int lib_net_get_broadcast(int fd, int enable) {
+int lib_net_set_broadcast(int fd, int enable) {
     return lib_setsockopt(fd, SOL_SOCKET, SO_BROADCAST, enable ? 1 : 0);
 }
 
