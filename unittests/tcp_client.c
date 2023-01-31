@@ -30,7 +30,7 @@ static int client(int fd, int argc, char **argv) {
 
         nread = read(fd, buf, sizeof(buf));
         if(nread == -1) {
-            perror("read");
+            LIB_LOG_ERR("read: %s", strerror(errno));
             exit(EXIT_FAILURE);
         }
 

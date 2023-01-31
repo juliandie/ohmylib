@@ -26,12 +26,12 @@ static int echo_server(int fd) {
 
         nread = read(fd, buf, sizeof(buf));
         if(nread == -1) {
-            LIB_LOG_ERR("recvfrom: %s", strerror(errno));
+            LIB_LOG_ERR("read: %s", strerror(errno));
             return -1;
         }
 
         if(nread == 0) {
-            LIB_LOG_INFO("connection closed");
+            LIB_LOG_INFO("connection was closed");
             goto out;
         }
 
