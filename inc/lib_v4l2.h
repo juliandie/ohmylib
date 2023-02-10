@@ -14,8 +14,6 @@ int v4l_set_format(int fd, struct v4l2_pix_format *format);
 int v4l_get_format(int fd, struct v4l2_pix_format *format);
 void v4l_munmap_buffer(int fd, void ***p, size_t n_buf);
 int v4l_mmap_buffer(int fd, void ***p, size_t n_buf);
-//void v4l_free_buffer(int fd, void ***p, size_t n_buf);
-//int v4l_alloc_buffer(int fd, void ***p, size_t n_buf);
 int v4l_stop(int fd);
 int v4l_start(int fd, size_t n_buf);
 int v4l_qbuf(int fd, int idx);
@@ -37,6 +35,7 @@ int main() {
     int fd;
     void *buf[3];
     int buf_count, buf_idx;
+    size_t buf_len;
     struct v4l2_pix_format format = {
         .width = 1920,
         .height = 1080,
@@ -62,7 +61,7 @@ int main() {
         if(v4l_poll(fd, 1000) <= 0)
             goto err_stop;
 
-        buf_idx = v4l_dqbuf(fd);
+        buf_idx = v4l_dqbuf(fd, &buf_len);
         if(buf_idx < 0)
             goto err_stop;
 

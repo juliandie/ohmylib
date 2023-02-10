@@ -36,22 +36,18 @@ int v4l_open(const char *videodev) {
         return -1;
 
     fd = open(videodev, O_RDWR /* required */ | O_NONBLOCK, 0);
-    if(fd < 0) {
+    if(fd < 0)
         return -1;
-    }
 
     memset(&cap, 0, sizeof(struct v4l2_capability));
-    if(v4l_ioctl(fd, VIDIOC_QUERYCAP, &cap) < 0) {
+    if(v4l_ioctl(fd, VIDIOC_QUERYCAP, &cap) < 0)
         goto close_fd;
-    }
 
-    if(!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
+    if(!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
         goto close_fd;
-    }
 
-    if(!(cap.capabilities & V4L2_CAP_STREAMING)) {
+    if(!(cap.capabilities & V4L2_CAP_STREAMING))
         goto close_fd;
-    }
 
     return fd;
 
@@ -67,9 +63,8 @@ int v4l_set_format(int fd, struct v4l2_pix_format *format) {
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     memcpy(&fmt.fmt, format, sizeof(struct v4l2_pix_format));
 
-    if(v4l_ioctl(fd, VIDIOC_S_FMT, &fmt) < 0) {
+    if(v4l_ioctl(fd, VIDIOC_S_FMT, &fmt) < 0)
         return -1;
-    }
 
     return 0;
 }
@@ -80,9 +75,8 @@ int v4l_get_format(int fd, struct v4l2_pix_format *format) {
     memset(&fmt, 0, sizeof(struct v4l2_format));
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-    if(v4l_ioctl(fd, VIDIOC_G_FMT, &fmt) < 0) {
+    if(v4l_ioctl(fd, VIDIOC_G_FMT, &fmt) < 0)
         return -1;
-    }
 
     memcpy(format, &fmt.fmt, sizeof(struct v4l2_pix_format));
 
@@ -105,13 +99,11 @@ void v4l_munmap_buffer(int fd, void ***p, size_t n_buf) {
         buf.memory = V4L2_MEMORY_MMAP;
         buf.index = i;
 
-        if(v4l_ioctl(fd, VIDIOC_QUERYBUF, &buf) < 0) {
+        if(v4l_ioctl(fd, VIDIOC_QUERYBUF, &buf) < 0)
             continue;
-        }
 
-        if(munmap(ptr[i], buf.length) < 0) {
+        if(munmap(ptr[i], buf.length) < 0)
             continue;
-        }
     }
 
     free(*p);
@@ -129,9 +121,8 @@ int v4l_mmap_buffer(int fd, void ***p, size_t n_buf) {
     req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     req.memory = V4L2_MEMORY_MMAP;
 
-    if(v4l_ioctl(fd, VIDIOC_REQBUFS, &req) < 0) {
+    if(v4l_ioctl(fd, VIDIOC_REQBUFS, &req) < 0)
         return -1;
-    }
 
     if(req.count < 2) {
         errno = ENOMEM;
@@ -163,7 +154,7 @@ int v4l_mmap_buffer(int fd, void ***p, size_t n_buf) {
             goto free_buffer;
         }
     }
-    ret = i;
+    ret = (int)i;
 
     *p = ptr;
     return ret;
@@ -175,9 +166,9 @@ free_buffer:
 
 int v4l_stop(int fd) {
     int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if(v4l_ioctl(fd, VIDIOC_STREAMOFF, &type) < 0) {
+    if(v4l_ioctl(fd, VIDIOC_STREAMOFF, &type) < 0)
         return -1;
-    }
+
     return 0;
 }
 
@@ -186,14 +177,12 @@ int v4l_start(int fd, size_t n_buf) {
     size_t i;
 
     for(i = 0; i < n_buf; i++) {
-        if(v4l_qbuf(fd, i) < 0) {
+        if(v4l_qbuf(fd, i) < 0)
             return -1;
-        }
     }
 
-    if(v4l_ioctl(fd, VIDIOC_STREAMON, &type) < 0) {
+    if(v4l_ioctl(fd, VIDIOC_STREAMON, &type) < 0)
         return -1;
-    }
 
     return 0;
 }
@@ -205,9 +194,9 @@ int v4l_qbuf(int fd, int idx) {
         .index = idx,
     };
 
-    if(v4l_ioctl(fd, VIDIOC_QBUF, &buf) < 0) {
+    if(v4l_ioctl(fd, VIDIOC_QBUF, &buf) < 0)
         return -1;
-    }
+
     return 0;
 }
 
@@ -217,12 +206,12 @@ int v4l_dqbuf(int fd, size_t *len) {
         .memory = V4L2_MEMORY_MMAP,
     };
 
-    if(v4l_ioctl(fd, VIDIOC_DQBUF, &buf) < 0) {
+    if(v4l_ioctl(fd, VIDIOC_DQBUF, &buf) < 0)
         return -1;
-    }
 
     if(len) {
         if(v4l_ioctl(fd, VIDIOC_QUERYBUF, &buf) < 0) {
+            return -1;
         }
         *len = buf.length;
     }
