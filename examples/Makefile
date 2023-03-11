@@ -23,6 +23,9 @@ endef
 
 $(foreach d,$(obj-dir),$(eval $(call make-goals,$(d))))
 
+ohmylib:
+	$(MAKE) -C ../ libohmylib.a
+
 clean: $(obj-dir:%=%-clean)
 
 .PHONY: $(PHONY)
