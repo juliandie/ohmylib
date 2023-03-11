@@ -41,10 +41,10 @@ static int client(int fd, int argc, char **argv) {
 
 int main(int argc, char **argv) {
     struct addrinfo hints = {
-        .ai_family = AF_UNSPEC,     /* Allow IPv4 or IPv6 */
+        .ai_family = AF_UNSPEC, /* Allow IPv4 or IPv6 */
         .ai_socktype = SOCK_STREAM, /* Datagram socket */
         .ai_flags = 0,
-        .ai_protocol = 0,           /* Any protocol */
+        .ai_protocol = 0, /* Any protocol */
     };
     struct addrinfo *res, *rp;
     int ret = 0, fd = 0;

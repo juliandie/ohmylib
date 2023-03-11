@@ -3,6 +3,6 @@
 
 #include <poll.h>
 
-int lib_poll(int fd, short events, int timeout_ms);
+int lib_poll(int fd, short events, int timeout);
 
-#endif
+#endif /* OHMYLIB_POLL_H_ */

@@ -1,61 +1,28 @@
-
-ifeq ($(BUILD_SRC),)
-	SRC_DIR := .
-else
-	SRC_DIR := $(BUILD_SRC)
-endif
-
-### Extend CFLAGS
-INCLUDES ?=
-INCLUDES += ./inc/
--include ../ohmylib.mk
-INCLUDES += ../$(OHMYLIB_INCLUDES)
-DEFINES ?=
-
-### Extend LDFLAGS
-LIBPATHS ?=
-LIBPATHS += .. 
-LIBRARIES ?= 
-
-### CFLAGS
-CFLAGS := -Wextra -Wall -Og -g
-CFLAGS += $(call cc-option,-fno-PIE)
-
-CFLAGS += $(INCLUDES:%=-I$(SRC_DIR)/%)
-CFLAGS += $(DEFINES:%=-D%)
-CFLAGS += $(LIBPATHS:%=-L%)
-
-### Linked libraries
-LLINK := -pthread $(LIBRARIES:%=-l%) $(OHMYLIB_LIBRARIES)
-
-### LDFLAGS
-LDFLAGS ?=
-LDFLAGS += -Wl,--start-group $(LIBRARIES:%=-l%) -Wl,--end-group
-
-C_SRC := $(wildcard $(SRC_DIR)/*.c)
-UNITTESTS := $(C_SRC:%.c=%)
+obj-dir := $(patsubst %/, %, $(sort $(dir $(wildcard */))))
 
 PHONY += all
-all: $(UNITTESTS)
+all: $(obj-dir)
 
-%: %.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LLINK) -o $@
+# Factory: Expand goals
+define make-goals
+PHONY += $1-clean
+$1-clean:
+	$(MAKE) -C $1 clean
 	
-ohmylib: 
-	$(MAKE) -C ../ libohmylib.a
+PHONY += $1-build
+$1-build:
+	$(MAKE) -C $1
 	
-PHONY += cppcheck
-cppcheck:
-	cppcheck ./
+PHONY += $1-rebuild
+$1-rebuild: $1-clean $1-build
+	
+PHONY += $1
+$1:
+	$(MAKE) -C $1
+endef
 
-PHONY += clean
-clean:
-	$(RM) -Rf $(UNITTESTS)
+$(foreach d,$(obj-dir),$(eval $(call make-goals,$(d))))
 
-PHONY += mrproper
-mrproper: clean
-
-PHONY += re
-re: clean all
+clean: $(obj-dir:%=%-clean)
 
 .PHONY: $(PHONY)

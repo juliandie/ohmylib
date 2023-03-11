@@ -7,6 +7,7 @@
 #include <netdb.h>
 
 #include <lib_sock.h>
+#include <lib_poll.h>
 #include <lib_log.h>
 
 static int echo_server(int fd) {
@@ -18,7 +19,7 @@ static int echo_server(int fd) {
 
     for(;;) {
         int ret;
-        ret = lib_poll(fd, 1000);
+        ret = poll(fd, POLLIN, 1000);
         if(ret < 0) {
             LIB_LOG_ERR("poll: %s", strerror(errno));
             return -1;
