@@ -19,7 +19,7 @@ static int echo_server(int fd) {
 
     for(;;) {
         int ret;
-        ret = poll(fd, POLLIN, 1000);
+        ret = lib_poll(fd, POLLIN, 1000);
         if(ret < 0) {
             LIB_LOG_ERR("poll: %s", strerror(errno));
             return -1;
@@ -62,10 +62,10 @@ static int echo_server(int fd) {
 
 int main(int argc, char **argv) {
     struct addrinfo hints = {
-        .ai_family = AF_UNSPEC,    /* Allow IPv4 or IPv6 */
+        .ai_family = AF_UNSPEC, /* Allow IPv4 or IPv6 */
         .ai_socktype = SOCK_DGRAM, /* Datagram socket */
-        .ai_flags = AI_PASSIVE,    /* For wildcard IP address */
-        .ai_protocol = 0,          /* Any protocol */
+        .ai_flags = AI_PASSIVE, /* For wildcard IP address */
+        .ai_protocol = 0, /* Any protocol */
     };
     struct addrinfo *res, *rp;
 	int ret = 0, fd = 0;
@@ -73,8 +73,7 @@ int main(int argc, char **argv) {
     __be16 port;
 
     if(argc < 2) {
-        fprintf(stderr, "Usage: %s <port>\n", argv[0]);
-        //goto out;
+        fprintf(stderr, "Usage: %s [port]\n", argv[0]);
     }
     else
         service = argv[1];
@@ -112,7 +111,7 @@ int main(int argc, char **argv) {
             LIB_LOG_ERR("lib_get_port");
         }
         else
-            LIB_LOG_INFO("port: %d", ntohs(port));
+            LIB_LOG_INFO("auto-assigned port: %d", ntohs(port));
     }
 
     echo_server(fd);

@@ -8,8 +8,8 @@
 
 int main(int argc, char *argv[]) {
     FILE *out, *in;
-    size_t size;
-    char *ptr;
+    size_t size = 0;
+    char *ptr = NULL;
 
     if(argc != 2) {
         fprintf(stderr, "Usage: %s '<num>...'\n", argv[0]);
