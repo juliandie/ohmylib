@@ -1,6 +1,3 @@
-
-#include <lib_netif.h>
-
 #include <stdlib.h> /** malloc, free */
 #include <unistd.h> /** close */
 #include <string.h> /** strcmp */
@@ -13,23 +10,8 @@
 #include <linux/route.h> /** rtentry */
 #include <sys/ioctl.h> /** ioctl */
 
-#if 0
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-
-#include <net/ethernet.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <netinet/ip.h>
-#include <netinet/ip_icmp.h>
-#include <netpacket/packet.h>
-#include <linux/types.h>
-
-#include <arpa/inet.h>
-#endif
-
 #include <lib_log.h>
+#include <lib_netif.h>
 
 static int lib_netif_ioctl(const char *ifname, int code, struct ifreq *ifr) {
     int sock, ret;

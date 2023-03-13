@@ -47,9 +47,9 @@ int main(/*int argc, char *argv[]*/) {
 
         /* For an AF_INET* interface address, display the address */
 
-        if(family == AF_INET || family == AF_INET6) {
+        if(addr->sa_family == AF_INET || addr->sa_family == AF_INET6) {
             s = getnameinfo(ifa->ifa_addr,
-                            (family == AF_INET) ? sizeof(struct sockaddr_in) :
+                            (addr->sa_family == AF_INET) ? sizeof(struct sockaddr_in) :
                             sizeof(struct sockaddr_in6),
                             host, NI_MAXHOST,
                             NULL, 0, NI_NUMERICHOST);
@@ -60,7 +60,7 @@ int main(/*int argc, char *argv[]*/) {
 
             printf("\t\taddress: <%s>\n", host);
         }
-        else if(family == AF_PACKET && ifa->ifa_data != NULL) {
+        else if(addr->sa_family == AF_PACKET && ifa->ifa_data != NULL) {
             struct rtnl_link_stats *stats = ifa->ifa_data;
 
             printf("\t\ttx_packets = %10u; rx_packets = %10u; "

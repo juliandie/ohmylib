@@ -3,6 +3,6 @@
 
 #include <sys/select.h>
 
-int lib_select_read(int fd, int timeout_sec, int timeout_usec);
+int lib_select_read(int fd, int tsec, int tusec);
 
 #endif
