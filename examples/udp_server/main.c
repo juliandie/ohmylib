@@ -17,6 +17,9 @@ static int echo_server(int fd) {
     ssize_t nread;
     char buf[1500];
 
+    //printf("press any key to continue...");
+    //getchar();
+
     for(;;) {
         int ret;
         ret = lib_poll(fd, POLLIN, 1000);

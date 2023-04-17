@@ -1,10 +1,3 @@
-
-ifeq ($(BUILD_SRC),)
-	SRC_DIR := .
-else
-	SRC_DIR := $(BUILD_SRC)
-endif
-
 ### Extend CFLAGS
 INCLUDES ?=
 INCLUDES += ./inc/
@@ -19,7 +12,7 @@ CFLAGS ?=
 CFLAGS += -Wextra -Wall -Og -g
 CFLAGS += -fPIC
 
-CFLAGS += $(INCLUDES:%=-I$(SRC_DIR)/%)
+CFLAGS += $(INCLUDES:%=-I$(CURDIR)/%)
 CFLAGS += $(DEFINES:%=-D%)
 CFLAGS += $(LIBPATHS:%=-L%)
 
@@ -32,7 +25,7 @@ LDFLAGS += -Wl,--start-group $(LIBRARIES:%=-l%) -Wl,--end-group
 
 -include cppcheck.mk
 
-C_SRC := $(wildcard $(SRC_DIR)/*.c)
+C_SRC := $(wildcard $(CURDIR)/*.c)
 -include src/subdir.mk
 
 C_OBJ := $(C_SRC:%.c=%.c.o)
@@ -47,8 +40,8 @@ libohmylib.a: $(C_OBJ)
 libohmylib.so: $(C_OBJ)
 	$(CC) $(CFLAGS) -fPIC -shared $^ $(LLINK) -o $@
 
-unittests:
-	$(MAKE) -C unittests
+examples:
+	$(MAKE) -C examples
 
 # Skeleton for subdir.mk, replace "%" with "relative/path/%"
 %.c.o: ./%.c ./%.h
@@ -68,6 +61,7 @@ cppcheck_config:
 
 PHONY += clean
 clean:
+	$(MAKE) -C examples clean
 	$(RM) -Rf $(TARGET) $(C_OBJ)
 
 PHONY += mrproper

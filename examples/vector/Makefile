@@ -48,4 +48,7 @@ PHONY += clean
 clean:
 	$(RM) -Rf $(obj-elf) $(obj-o)
 
+PHONY += mrproper
+mrproper: clean
+
 .PHONY: $(PHONY)
