@@ -11,6 +11,7 @@ LIBRARIES := rt
 CFLAGS ?= 
 CFLAGS += -Wextra -Wall -Og -g
 CFLAGS += -fPIC
+CFLAGS += $(call cc-option,-fno-PIE)
 
 CFLAGS += $(INCLUDES:%=-I$(CURDIR)/%)
 CFLAGS += $(DEFINES:%=-D%)
