@@ -1,8 +1,7 @@
-C_SRC += $(wildcard $(SRC_DIR)/src/*.c)
-C_HDR += $(wildcard $(SRC_DIR)/inc/*.h)
+C_SRC += $(wildcard src/*.c)
 
-./src/%.c.o: ./src/%.c ./inc/%.h
+src/%.o: src/%.c inc/%.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-./src/%.c.o: ./src/%.c
+src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@

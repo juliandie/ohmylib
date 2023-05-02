@@ -8,28 +8,26 @@ LIBPATHS :=
 LIBRARIES := rt
 
 ### CFLAGS
-CFLAGS ?= 
-CFLAGS += -Wextra -Wall -Og -g
-CFLAGS += -fPIC
+CFLAGS ?= -Wextra -Wall -Og -g -fPIC
 CFLAGS += $(call cc-option,-fno-PIE)
-
-CFLAGS += $(INCLUDES:%=-I$(CURDIR)/%)
-CFLAGS += $(DEFINES:%=-D%)
-CFLAGS += $(LIBPATHS:%=-L%)
+CFLAGS += $(addprefix  -I, $(INCLUDES))
+CFLAGS += $(addprefix  -L, $(LIBPATHS))
+CFLAGS += $(addprefix  -D, $(DEFINES))
 
 ### Linked libraries
-LLINK := -pthread $(LIBRARIES:%=-l%)
+LLINK := -pthread $(addprefix  -l, $(LIBRARIES))
 
 ### LDFLAGS
 LDFLAGS ?=
-LDFLAGS += -Wl,--start-group $(LIBRARIES:%=-l%) -Wl,--end-group
+LDFLAGS += -Wl,--start-group $(LLINK) -Wl,--end-group
 
+SRC_DIR := ./
 -include cppcheck.mk
 
 C_SRC := $(wildcard $(CURDIR)/*.c)
 -include src/subdir.mk
 
-C_OBJ := $(C_SRC:%.c=%.c.o)
+C_OBJ := $(C_SRC:%.c=%.o)
 
 TARGET:= libohmylib.a
 PHONY := all
@@ -45,11 +43,11 @@ examples:
 	$(MAKE) -C examples
 
 # Skeleton for subdir.mk, replace "%" with "relative/path/%"
-%.c.o: ./%.c ./%.h
+%.o: %.c %.h
 	$(CC) $(CFLAGS) -c $< -o $@
 	
 # Skeleton for subdir.mk, replace "%" with "relative/path/%"
-%.c.o: %.c
+%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 PHONY += cppcheck

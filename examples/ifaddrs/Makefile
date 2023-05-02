@@ -2,31 +2,39 @@
 obj-elf := $(shell basename $(shell pwd))
 
 ### Simplified CFLAGS
+# Includes will be prefixed with -I automatically
 INCLUDES ?= ../../inc/
+# Defines will be prefixed with -D automatically
 DEFINES ?=
 
 ### Simplified LDFLAGS
+# Libpaths will be prefixed with -L automatically
 LIBPATHS ?= ../../
+# Libpaths will be prefixed with -l automatically
+# Add libraries like pthread to LLINK directly
 LIBRARIES ?= ohmylib rt
+
+### Linked libraries
+LLINK := -pthread $(LIBRARIES:%=-l%)
 
 ### CFLAGS
 CFLAGS := -Wextra -Wall -Og -g
-CFLAGS += $(call cc-option,-fno-PIE)
-CFLAGS += $(INCLUDES:%=-I%)
-CFLAGS += $(DEFINES:%=-D%)
-CFLAGS += $(LIBPATHS:%=-L%)
-
-### Linked libraries
-LLINK := -pthread $(LIBRARIES:%=-l%) -lohmylib -lrt
+CFLAGS += $(addprefix  -I, $(INCLUDES))
+CFLAGS += $(addprefix  -L, $(LIBPATHS))
+CFLAGS += $(addprefix  -D, $(DEFINES))
 
 ### LDFLAGS
-LDFLAGS ?= -Wl,--start-group $(LIBRARIES:%=-l%) -Wl,--end-group
+LDFLAGS ?= -Wl,--start-group $(addprefix  -l, $(DEFINES)) -Wl,--end-group
 
 obj-c := $(wildcard *.c */*.c)
 obj-cpp := $(wildcard *.cpp */*.cpp)
-obj-asm := $(wildcard *.S */*.S)
+obj-asm := $(wildcard *.s */*.s)
+### Include subdirs
+# -include src/subdir.mk
 
 obj-o := $(obj-c:%.c=%.o)
+obj-o += $(obj-cpp:%.cpp=%.o)
+obj-o += $(obj-asm:%.s=%.o)
 
 PHONY += all
 all: $(obj-elf)

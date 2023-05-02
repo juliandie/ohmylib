@@ -12,7 +12,7 @@ CPPCHECKIGNORES += doc
 ################################################################################
 
 CPPCHECKFLAGS := $(CPPCHECKIGNORES:%=-i%)
-CPPCHECKFLAGS += $(SRC_DIR)
+CPPCHECKFLAGS += ./
 CPPCHECKFLAGS += $(CPPCHECKINCLUDES:%=-I %)
 CPPCHECKFLAGS += $(CPPCHECKDEFINES:%=-D%)
 CPPCHECKFLAGS += --force
