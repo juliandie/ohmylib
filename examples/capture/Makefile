@@ -19,12 +19,12 @@ LLINK := -pthread $(LIBRARIES:%=-l%)
 
 ### CFLAGS
 CFLAGS := -Wextra -Wall -Og -g
-CFLAGS += $(addprefix  -I, $(INCLUDES))
-CFLAGS += $(addprefix  -L, $(LIBPATHS))
-CFLAGS += $(addprefix  -D, $(DEFINES))
+CFLAGS += $(addprefix -I, $(INCLUDES))
+CFLAGS += $(addprefix -L, $(LIBPATHS))
+CFLAGS += $(addprefix -D, $(DEFINES))
 
 ### LDFLAGS
-LDFLAGS ?= -Wl,--start-group $(addprefix  -l, $(DEFINES)) -Wl,--end-group
+LDFLAGS ?= -Wl,--start-group $(addprefix -l, $(DEFINES)) -Wl,--end-group
 
 obj-c := $(wildcard *.c */*.c)
 obj-cpp := $(wildcard *.cpp */*.cpp)

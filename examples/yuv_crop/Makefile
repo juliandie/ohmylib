@@ -3,19 +3,19 @@ obj-elf := $(shell basename $(shell pwd))
 
 ### Simplified CFLAGS
 # Includes will be prefixed with -I automatically
-INCLUDES ?=
+INCLUDES ?= ../../inc
 # Defines will be prefixed with -D automatically
 DEFINES ?=
 
 ### Simplified LDFLAGS
 # Libpaths will be prefixed with -L automatically
-LIBPATHS ?=
+LIBPATHS ?= ../../
 # Libpaths will be prefixed with -l automatically
 # Add libraries like pthread to LLINK directly
-LIBRARIES ?= rt
+LIBRARIES ?= ohmylib
 
 ### Linked libraries
-LLINK := -pthread $(LIBRARIES:%=-l%)
+LLINK := $(LIBRARIES:%=-l%)
 
 ### CFLAGS
 CFLAGS := -Wextra -Wall -Og -g

@@ -8,18 +8,39 @@
 #include <unistd.h>
 #include <linux/if_link.h>
 
-
-#include <sys/socket.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <linux/netlink.h>
-#include <linux/rtnetlink.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <net/if.h>
-
+#if 0 // see man rtnetlink PF_NETLINK
 #define BUFFER_SIZE 4096
+
+int getgatewayandiface(in_addr_t *addr, char *interface) {
+    long destination, gateway;
+    char iface[IF_NAMESIZE];
+    char buf[BUFFER_SIZE];
+    FILE *file;
+
+    memset(iface, 0, sizeof(iface));
+    memset(buf, 0, sizeof(buf));
+
+    file = fopen("/proc/net/route", "r");
+    if(!file)
+        return -1;
+
+    while(fgets(buf, sizeof(buf), file)) {
+        if(sscanf(buf, "%s %lx %lx", iface, &destination, &gateway) == 3) {
+            if(destination == 0) { /* default */
+                *addr = gateway;
+                strcpy(interface, iface);
+                fclose(file);
+                return 0;
+            }
+        }
+    }
+
+    /* default route not found */
+    if(file)
+        fclose(file);
+    return -1;
+}
+#endif
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -80,20 +101,33 @@ static void print_netif(struct ifaddrs *ifa) {
     printf("%-8s %s (%d)\n", ifa->ifa_name, sa, addr->sa_family);
 }
 
-int getgatewayandiface() {
+
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <net/if.h>
+
+#define BUFFER_SIZE 4096
+
+int getgatewayandiface()
+{
     int     received_bytes = 0, msg_len = 0, route_attribute_len = 0;
-    int     sock = -1;
-    uint32_t msgseq = 0;
+    int     sock = -1, msgseq = 0;
     struct  nlmsghdr *nlh, *nlmsg;
     struct  rtmsg *route_entry;
     // This struct contain route attributes (route type)
     struct  rtattr *route_attribute;
     char    gateway_address[INET_ADDRSTRLEN], interface[IF_NAMESIZE];
     char    msgbuf[BUFFER_SIZE], buffer[BUFFER_SIZE];
-    char *ptr = buffer;
+    char    *ptr = buffer;
     struct timeval tv;
 
-    if((sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) < 0) {
+    if ((sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) < 0) {
         perror("socket failed");
         return EXIT_FAILURE;
     }
@@ -117,30 +151,32 @@ int getgatewayandiface() {
     tv.tv_sec = 1;
     setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *)&tv, sizeof(struct timeval));
     /* send msg */
-    if(send(sock, nlmsg, nlmsg->nlmsg_len, 0) < 0) {
+    if (send(sock, nlmsg, nlmsg->nlmsg_len, 0) < 0) {
         perror("send failed");
         return EXIT_FAILURE;
     }
 
     /* receive response */
-    do {
+    do
+    {
         received_bytes = recv(sock, ptr, sizeof(buffer) - msg_len, 0);
-        if(received_bytes < 0) {
+        if (received_bytes < 0) {
             perror("Error in recv");
             return EXIT_FAILURE;
         }
 
-        nlh = (struct nlmsghdr *)ptr;
+        nlh = (struct nlmsghdr *) ptr;
 
         /* Check if the header is valid */
         if((NLMSG_OK(nlmsg, received_bytes) == 0) ||
-           (nlmsg->nlmsg_type == NLMSG_ERROR)) {
+           (nlmsg->nlmsg_type == NLMSG_ERROR))
+        {
             perror("Error in received packet");
             return EXIT_FAILURE;
         }
 
         /* If we received all data break */
-        if(nlh->nlmsg_type == NLMSG_DONE)
+        if (nlh->nlmsg_type == NLMSG_DONE)
             break;
         else {
             ptr += received_bytes;
@@ -148,25 +184,28 @@ int getgatewayandiface() {
         }
 
         /* Break if its not a multi part message */
-        if((nlmsg->nlmsg_flags & NLM_F_MULTI) == 0)
+        if ((nlmsg->nlmsg_flags & NLM_F_MULTI) == 0)
             break;
-    } while((nlmsg->nlmsg_seq != msgseq) || (nlmsg->nlmsg_pid != (uint32_t)getpid()));
+    }
+    while ((nlmsg->nlmsg_seq != msgseq) || (nlmsg->nlmsg_pid != getpid()));
 
     /* parse response */
-    for(; NLMSG_OK(nlh, received_bytes); nlh = NLMSG_NEXT(nlh, received_bytes)) {
+    for ( ; NLMSG_OK(nlh, received_bytes); nlh = NLMSG_NEXT(nlh, received_bytes))
+    {
         /* Get the route data */
-        route_entry = (struct rtmsg *)NLMSG_DATA(nlh);
+        route_entry = (struct rtmsg *) NLMSG_DATA(nlh);
 
         /* We are just interested in main routing table */
-        if(route_entry->rtm_table != RT_TABLE_MAIN)
+        if (route_entry->rtm_table != RT_TABLE_MAIN)
             continue;
 
-        route_attribute = (struct rtattr *)RTM_RTA(route_entry);
+        route_attribute = (struct rtattr *) RTM_RTA(route_entry);
         route_attribute_len = RTM_PAYLOAD(nlh);
 
         /* Loop through all attributes */
-        for(; RTA_OK(route_attribute, route_attribute_len);
-            route_attribute = RTA_NEXT(route_attribute, route_attribute_len)) {
+        for ( ; RTA_OK(route_attribute, route_attribute_len);
+              route_attribute = RTA_NEXT(route_attribute, route_attribute_len))
+        {
             switch(route_attribute->rta_type) {
             case RTA_OIF:
                 if_indextoname(*(int *)RTA_DATA(route_attribute), interface);
@@ -180,7 +219,7 @@ int getgatewayandiface() {
             }
         }
 
-        if((*gateway_address) && (*interface)) {
+        if ((*gateway_address) && (*interface)) {
             fprintf(stdout, "Gateway %s for interface %s\n", gateway_address, interface);
             break;
         }
@@ -190,7 +229,63 @@ int getgatewayandiface() {
 
     return 0;
 }
+#if 0
+static void netlink_event(void) {
+    struct sockaddr_nl sa;
 
+    memset(&sa, 0, sizeof(sa));
+    sa.nl_family = AF_NETLINK;
+    sa.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_IFADDR;
+
+    fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+    bind(fd, (struct sockaddr *)&sa, sizeof(sa));
+
+// The next example demonstrates how to send a netlink message to the kernel (pid 0).  Note that the application must take care of message sequence numbers in order to reliably track acknowledgements.
+
+    struct nlmsghdr *nh;    /* The nlmsghdr with payload to send */
+    struct sockaddr_nl sa;
+    struct iovec iov = {nh, nh->nlmsg_len};
+    struct msghdr msg;
+
+    msg = {&sa, sizeof(sa), &iov, 1, NULL, 0, 0};
+    memset(&sa, 0, sizeof(sa));
+    sa.nl_family = AF_NETLINK;
+    nh->nlmsg_pid = 0;
+    nh->nlmsg_seq = ++sequence_number;
+    /* Request an ack from kernel by setting NLM_F_ACK */
+    nh->nlmsg_flags |= NLM_F_ACK;
+
+    sendmsg(fd, &msg, 0);
+
+// And the last example is about reading netlink message.
+
+    int len;
+    /* 8192 to avoid message truncation on platforms with
+       page size > 4096 */
+    struct nlmsghdr buf[8192 / sizeof(struct nlmsghdr)];
+    struct iovec iov = {buf, sizeof(buf)};
+    struct sockaddr_nl sa;
+    struct msghdr msg;
+    struct nlmsghdr *nh;
+
+    msg = {&sa, sizeof(sa), &iov, 1, NULL, 0, 0};
+    len = recvmsg(fd, &msg, 0);
+
+    for(nh = (struct nlmsghdr *)buf; NLMSG_OK(nh, len);
+        nh = NLMSG_NEXT(nh, len)) {
+       /* The end of multipart message */
+        if(nh->nlmsg_type == NLMSG_DONE)
+            return;
+
+        if(nh->nlmsg_type == NLMSG_ERROR)
+            /* Do some error handling */
+            ...
+
+            /* Continue with parsing payload */
+            ...
+    }
+}
+#endif
 int main(/*int argc, char *argv[]*/) {
     struct ifaddrs *ifaddr;
     struct sockaddr *addr;
@@ -213,8 +308,7 @@ int main(/*int argc, char *argv[]*/) {
 
         /* For an AF_INET* interface address, display the address */
 
-        switch(addr->sa_family) {
-        case AF_INET:
+        if(addr->sa_family == AF_INET || addr->sa_family == AF_INET6) {
             print_netif(ifa);
             s = getnameinfo(ifa->ifa_addr,
                             (addr->sa_family == AF_INET) ? sizeof(struct sockaddr_in) :
@@ -227,48 +321,17 @@ int main(/*int argc, char *argv[]*/) {
             }
 
             printf("\t\taddress: <%s>\n", host);
-            break;
-        case AF_INET6:
+        }
 #if 0
-            print_netif(ifa);
-            s = getnameinfo(ifa->ifa_addr,
-                            (addr->sa_family == AF_INET) ? sizeof(struct sockaddr_in) :
-                            sizeof(struct sockaddr_in6),
-                            host, NI_MAXHOST,
-                            NULL, 0, NI_NUMERICHOST);
-            if(s != 0) {
-                printf("getnameinfo() failed: %s\n", gai_strerror(s));
-                exit(EXIT_FAILURE);
-            }
-
-            printf("\t\taddress: <%s>\n", host);
-#endif
-            break;
-        case AF_PACKET:
-        {
-#if 1
+        else if(addr->sa_family == AF_PACKET && ifa->ifa_data != NULL) {
             struct rtnl_link_stats *stats = ifa->ifa_data;
 
-            if(!stats)
-                continue;
-
-            print_netif(ifa);
-
-            printf("\t\ttx_packets = %10u; "
-                   "rx_packets = %10u; "
-                   "tx_bytes   = %10u; "
-                   "rx_bytes   = %10u\n",
-                   stats->tx_packets,
-                   stats->rx_packets,
-                   stats->tx_bytes,
-                   stats->rx_bytes);
-#endif
-        } break;
-        default:
-            print_netif(ifa);
-            printf("\t\tdunno\n");
-            break;
+            printf("\t\ttx_packets = %10u; rx_packets = %10u; "
+                   "tx_bytes   = %10u; rx_bytes   = %10u\n",
+                   stats->tx_packets, stats->rx_packets,
+                   stats->tx_bytes, stats->rx_bytes);
         }
+#endif
     }
 
     freeifaddrs(ifaddr);

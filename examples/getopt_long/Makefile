@@ -3,28 +3,28 @@ obj-elf := $(shell basename $(shell pwd))
 
 ### Simplified CFLAGS
 # Includes will be prefixed with -I automatically
-INCLUDES ?=
+INCLUDES ?= 
 # Defines will be prefixed with -D automatically
 DEFINES ?=
 
 ### Simplified LDFLAGS
 # Libpaths will be prefixed with -L automatically
-LIBPATHS ?=
+LIBPATHS ?= 
 # Libpaths will be prefixed with -l automatically
 # Add libraries like pthread to LLINK directly
-LIBRARIES ?= rt
+LIBRARIES ?= 
 
 ### Linked libraries
 LLINK := -pthread $(LIBRARIES:%=-l%)
 
 ### CFLAGS
 CFLAGS := -Wextra -Wall -Og -g
-CFLAGS += $(addprefix  -I, $(INCLUDES))
-CFLAGS += $(addprefix  -L, $(LIBPATHS))
-CFLAGS += $(addprefix  -D, $(DEFINES))
+CFLAGS += $(addprefix -I, $(INCLUDES))
+CFLAGS += $(addprefix -L, $(LIBPATHS))
+CFLAGS += $(addprefix -D, $(DEFINES))
 
 ### LDFLAGS
-LDFLAGS ?= -Wl,--start-group $(addprefix  -l, $(DEFINES)) -Wl,--end-group
+LDFLAGS ?= -Wl,--start-group $(addprefix -l, $(DEFINES)) -Wl,--end-group
 
 obj-c := $(wildcard *.c */*.c)
 obj-cpp := $(wildcard *.cpp */*.cpp)
@@ -44,9 +44,6 @@ all: $(obj-elf)
 
 $(obj-elf): $(obj-o)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LLINK) -o $@
-
-ohmylib: 
-	$(MAKE) -C ../../ libohmylib.a
 	
 PHONY += cppcheck
 cppcheck:
