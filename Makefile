@@ -1,6 +1,6 @@
 ### Extend CFLAGS
 INCLUDES ?=
-INCLUDES += ./inc/
+INCLUDES += ./inc
 DEFINES ?=
 
 ### Extend LDFLAGS
@@ -10,12 +10,12 @@ LIBRARIES := rt
 ### CFLAGS
 CFLAGS ?= -Wextra -Wall -Og -g -fPIC
 CFLAGS += $(call cc-option,-fno-PIE)
-CFLAGS += $(addprefix  -I, $(INCLUDES))
-CFLAGS += $(addprefix  -L, $(LIBPATHS))
-CFLAGS += $(addprefix  -D, $(DEFINES))
+CFLAGS += $(addprefix -I, $(INCLUDES))
+CFLAGS += $(addprefix -L, $(LIBPATHS))
+CFLAGS += $(addprefix -D, $(DEFINES))
 
 ### Linked libraries
-LLINK := -pthread $(addprefix  -l, $(LIBRARIES))
+LLINK := -pthread $(addprefix -l, $(LIBRARIES))
 
 ### LDFLAGS
 LDFLAGS ?=

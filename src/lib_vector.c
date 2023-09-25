@@ -1,3 +1,4 @@
+#if 0
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,3 +23,4 @@ int lib_vector_append(void **p, void *v, size_t len, size_t num) {
 
     return 0;
 }
+#endif
