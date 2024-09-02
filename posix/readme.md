@@ -3,3 +3,4 @@ getopt
 getopt_long
 fmemopen
 open_memstream
+getifaddrs
