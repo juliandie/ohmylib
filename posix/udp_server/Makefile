@@ -2,12 +2,12 @@
 obj-elf := $(shell basename $(shell pwd))
 
 ### Simplified CFLAGS
-INCLUDES ?= ../../includes
+INCLUDES ?=
 DEFINES ?=
 
 ### Simplified LDFLAGS
-LIBPATHS ?= ../../
-LIBRARIES ?= ohmylib
+LIBPATHS ?=
+LIBRARIES ?=
 
 ### CFLAGS
 ccflags := $(CFLAGS) -Wextra -Wall -Og -g

@@ -1,3 +1,0 @@
-Change lib_netif return values to in_addr_t and don't use ntohl
-Make generic network packet for udp, tcp and raw?
-Add tcp

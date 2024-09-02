@@ -2,12 +2,12 @@
 obj-elf := $(shell basename $(shell pwd))
 
 ### Simplified CFLAGS
-INCLUDES ?= ../../includes
+INCLUDES ?= 
 DEFINES ?=
 
 ### Simplified LDFLAGS
-LIBPATHS ?= ../../
-LIBRARIES ?= ohmylib
+LIBPATHS ?= 
+LIBRARIES ?= 
 
 ### CFLAGS
 ccflags := $(CFLAGS) -Wextra -Wall -Og -g
@@ -17,9 +17,11 @@ ccflags += $(INCLUDES:%=-I%) $(LIBPATHS:%=-L%) $(DEFINES:%=-D%)
 LLINK := -pthread $(LIBRARIES:%=-l%)
 LDFLAGS ?= -Wl,--start-group $(LLINK) -Wl,--end-group
 
-obj-c := $(wildcard *.c */*.c)
-obj-cpp := $(wildcard *.cpp */*.cpp)
-obj-asm := $(wildcard *.s */*.s)
+obj-c :=   #$(wildcard *.c)
+obj-cpp := #$(wildcard *.cpp)
+obj-asm := #$(wildcard *.s)
+obj-main := $(wildcard ./*.c)
+obj-elf  := $(obj-main:%.c=%)
 ### Include subdirs
 # -include src/subdir.mk
 
@@ -31,9 +33,13 @@ all: $(obj-elf)
 
 %.o: %.c
 	$(CC) $(ccflags) -c $< -o $@
-
-$(obj-elf): $(obj-o)
-	$(CC) $(ccflags) $(LDFLAGS) $^ $(LLINK) -o $@
+	
+# Factory: Expand goals for obj-elf
+define make-elf-goal
+$(1): $(1).o $(2)
+	$(CC) $(CFLAGS) $(LDFLAGS) $$^ $(LLINK) -o $$@
+endef
+$(foreach elf,$(obj-elf),$(eval $(call make-elf-goal,$(elf),$(obj-o))))
 
 clean:
 	$(RM) -Rf $(obj-elf) $(obj-o)

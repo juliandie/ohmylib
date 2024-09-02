@@ -3,7 +3,7 @@ obj-elf := $(shell basename $(shell pwd))
 
 ### Simplified CFLAGS
 INCLUDES ?= ../../includes
-DEFINES ?=
+DEFINES ?= LOG_LEVEL=7
 
 ### Simplified LDFLAGS
 LIBPATHS ?= ../../

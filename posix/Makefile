@@ -4,9 +4,14 @@ targets := $(patsubst $(CURDIR)/%, %, $(dirs))
 PHONY := all
 all: build
 
+test:
+	@echo $(dirs)
+	@echo ""
+	@echo $(targets)
+
 PHONY += build
 build:
-	for t in $(targets); do $(MAKE) -C $$t all; done
+	for t in $(targets); do $(MAKE) -C $$t; done
 
 PHONY += clean
 clean:

@@ -2,29 +2,20 @@
 obj-elf := $(shell basename $(shell pwd))
 
 ### Simplified CFLAGS
-# Includes will be prefixed with -I automatically
-INCLUDES ?= ../../inc/
-# Defines will be prefixed with -D automatically
+INCLUDES ?= ../../includes
 DEFINES ?=
 
 ### Simplified LDFLAGS
-# Libpaths will be prefixed with -L automatically
 LIBPATHS ?= ../../
-# Libpaths will be prefixed with -l automatically
-# Add libraries like pthread to LLINK directly
-LIBRARIES ?= ohmylib rt
+LIBRARIES ?= ohmylib
+
+### CFLAGS
+ccflags := $(CFLAGS) -Wextra -Wall -Og -g
+ccflags += $(INCLUDES:%=-I%) $(LIBPATHS:%=-L%) $(DEFINES:%=-D%)
 
 ### Linked libraries
 LLINK := -pthread $(LIBRARIES:%=-l%)
-
-### CFLAGS
-CFLAGS := -Wextra -Wall -Og -g
-CFLAGS += $(addprefix  -I, $(INCLUDES))
-CFLAGS += $(addprefix  -L, $(LIBPATHS))
-CFLAGS += $(addprefix  -D, $(DEFINES))
-
-### LDFLAGS
-LDFLAGS ?= -Wl,--start-group $(addprefix  -l, $(DEFINES)) -Wl,--end-group
+LDFLAGS ?= -Wl,--start-group $(LLINK) -Wl,--end-group
 
 obj-c := $(wildcard *.c */*.c)
 obj-cpp := $(wildcard *.cpp */*.cpp)
@@ -36,24 +27,15 @@ obj-o := $(obj-c:%.c=%.o)
 obj-o += $(obj-cpp:%.cpp=%.o)
 obj-o += $(obj-asm:%.s=%.o)
 
-PHONY += all
 all: $(obj-elf)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(ccflags) -c $< -o $@
 
 $(obj-elf): $(obj-o)
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LLINK) -o $@
+	$(CC) $(ccflags) $(LDFLAGS) $^ $(LLINK) -o $@
 
-ohmylib: 
-	$(MAKE) -C ../../ libohmylib.a
-	
-PHONY += cppcheck
-cppcheck:
-	cppcheck ./
-
-PHONY += clean
 clean:
 	$(RM) -Rf $(obj-elf) $(obj-o)
 
-.PHONY: $(PHONY)
+.PHONY: all clean

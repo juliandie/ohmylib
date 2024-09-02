@@ -17,9 +17,9 @@ ccflags += $(INCLUDES:%=-I%) $(LIBPATHS:%=-L%) $(DEFINES:%=-D%)
 LLINK := -pthread $(LIBRARIES:%=-l%)
 LDFLAGS ?= -Wl,--start-group $(LLINK) -Wl,--end-group
 
-obj-c := $(wildcard *.c */*.c)
-obj-cpp := $(wildcard *.cpp */*.cpp)
-obj-asm := $(wildcard *.s */*.s)
+obj-c :=   $(wildcard *.c)
+obj-cpp := $(wildcard *.cpp)
+obj-asm := $(wildcard *.s)
 ### Include subdirs
 # -include src/subdir.mk
 

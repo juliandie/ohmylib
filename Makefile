@@ -1,74 +1,60 @@
-### Extend CFLAGS
-INCLUDES ?=
-INCLUDES += ./inc
+# Set parent folder name as target lib
+#obj-lib := $(shell basename $(shell pwd))
+obj-lib := libohmylib.a
+
+### Simplified CFLAGS
+# Includes will be prefixed with -I automatically
+INCLUDES ?= ./includes/
+# Defines will be prefixed with -D automatically
 DEFINES ?=
 
-### Extend LDFLAGS
-LIBPATHS :=
-LIBRARIES := rt
-
-### CFLAGS
-CFLAGS ?= -Wextra -Wall -Og -g -fPIC
-CFLAGS += $(call cc-option,-fno-PIE)
-CFLAGS += $(addprefix -I, $(INCLUDES))
-CFLAGS += $(addprefix -L, $(LIBPATHS))
-CFLAGS += $(addprefix -D, $(DEFINES))
+### Simplified LDFLAGS
+# Libpaths will be prefixed with -L automatically
+LIBPATHS ?= 
+# Libpaths will be prefixed with -l automatically
+# Add libraries like pthread to LLINK directly
+#LIBRARIES ?= rt
 
 ### Linked libraries
-LLINK := -pthread $(addprefix -l, $(LIBRARIES))
+LLINK := -pthread $(LIBRARIES:%=-l%)
+
+### CFLAGS
+ccflags ?= -Wextra -Wall -Og -g -fPIC
+ccflags += $(call cc-option,-fno-PIE)
+ccflags += $(INCLUDES:%=-I%) $(LIBPATHS:%=-L%) $(DEFINES:%=-D%)
 
 ### LDFLAGS
-LDFLAGS ?=
-LDFLAGS += -Wl,--start-group $(LLINK) -Wl,--end-group
+LDFLAGS ?= -Wl,--start-group $(LLINK) -Wl,--end-group
 
-SRC_DIR := ./
--include cppcheck.mk
+#obj-c := $(wildcard *.c */*.c)
+#obj-cpp := $(wildcard *.cpp */*.cpp)
+#obj-asm := $(wildcard *.s */*.s)
+### Include subdirs
+-include lib/subdir.mk
 
-C_SRC := $(wildcard $(CURDIR)/*.c)
--include src/subdir.mk
+obj-o := $(obj-c:%.c=%.o)
+obj-o += $(obj-cpp:%.cpp=%.o)
+obj-o += $(obj-asm:%.s=%.o)
 
-C_OBJ := $(C_SRC:%.c=%.o)
-
-TARGET:= libohmylib.a
-PHONY := all
-all: $(TARGET)
-
-libohmylib.a: $(C_OBJ)
-	$(AR) rcs $@ $^
-
-libohmylib.so: $(C_OBJ)
-	$(CC) $(CFLAGS) -fPIC -shared $^ $(LLINK) -o $@
-
-examples:
-	$(MAKE) -C examples
+all: $(obj-lib)
 
 # Skeleton for subdir.mk, replace "%" with "relative/path/%"
 %.o: %.c %.h
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(ccflags) -c $< -o $@
 	
 # Skeleton for subdir.mk, replace "%" with "relative/path/%"
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(ccflags) -c $< -o $@
 
-PHONY += cppcheck
-cppcheck:
-	cppcheck $(CPPCHECKFLAGS)
+libohmylib.a: $(obj-o)
+	$(AR) rcs $@ $^
 
-PHONY += cppcheck_config
-cppcheck_config:
-	cppcheck $(CPPCHECKFLAGS) --check-config
+libohmylib.so: $(obj-o)
+	$(CC) $(ccflags) -fPIC -shared $^ $(LLINK) -o $@
 
-PHONY += clean
 clean:
-	$(MAKE) -C examples clean
-	$(RM) -Rf $(TARGET) $(C_OBJ)
+	$(RM) -Rf $(obj-o) libohmylib.a libohmylib.so
 
-PHONY += mrproper
-mrproper: clean
-
-PHONY += re
-re: clean all
-
-.PHONY: $(PHONY)
+.PHONY: all clean
 
 # vim: noet ts=8 sw=8
