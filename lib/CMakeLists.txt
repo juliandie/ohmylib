@@ -6,7 +6,7 @@ add_library(ohmylib
     ./lfsr.c
     ./printlog.c
     ./queue.c
-    ./sx_sysreg.c
+    "sysreg.c"
     ./timestamp.c
  "cvector.c")
 

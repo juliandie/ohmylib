@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-/** void *ptrs refer to **obj but void **ptrs wouldn't work */
+/** void *ptrs refer to **obj, see examples/vector */
 void freev(void *ptrs);
 void *pushv(void *ptr, void *ptrs);
 void *popv(void *ptrs);

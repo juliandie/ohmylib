@@ -36,6 +36,7 @@ int main() {
     printf("vectors has %lu elements\n", countv(v));
     int flipflop = 0;
     do {
+        /** switch between poping from back and front */
         if(flipflop) {
             s = popv(v);
             if(!s) {
