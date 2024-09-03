@@ -3,17 +3,13 @@
 obj-lib := libohmylib.a
 
 ### Simplified CFLAGS
-# Includes will be prefixed with -I automatically
 INCLUDES ?= ./includes/
-# Defines will be prefixed with -D automatically
 DEFINES ?=
 
 ### Simplified LDFLAGS
-# Libpaths will be prefixed with -L automatically
 LIBPATHS ?= 
-# Libpaths will be prefixed with -l automatically
 # Add libraries like pthread to LLINK directly
-#LIBRARIES ?= rt
+LIBRARIES ?=
 
 ### Linked libraries
 LLINK := -pthread $(LIBRARIES:%=-l%)
@@ -26,9 +22,9 @@ ccflags += $(INCLUDES:%=-I%) $(LIBPATHS:%=-L%) $(DEFINES:%=-D%)
 ### LDFLAGS
 LDFLAGS ?= -Wl,--start-group $(LLINK) -Wl,--end-group
 
-#obj-c := $(wildcard *.c */*.c)
-#obj-cpp := $(wildcard *.cpp */*.cpp)
-#obj-asm := $(wildcard *.s */*.s)
+#obj-c   := $(wildcard *.c)
+#obj-cpp := $(wildcard *.cpp)
+#obj-asm := $(wildcard *.s)
 ### Include subdirs
 -include lib/subdir.mk
 
@@ -51,10 +47,13 @@ libohmylib.a: $(obj-o)
 
 libohmylib.so: $(obj-o)
 	$(CC) $(ccflags) -fPIC -shared $^ $(LLINK) -o $@
+	
+cppcheck:
+	cppcheck ./
 
 clean:
 	$(RM) -Rf $(obj-o) libohmylib.a libohmylib.so
 
-.PHONY: all clean
+.PHONY: all cppcheck clean 
 
 # vim: noet ts=8 sw=8
