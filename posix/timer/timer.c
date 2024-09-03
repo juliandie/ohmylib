@@ -184,7 +184,7 @@ int main() {
         case 'p':
         { // pause
             struct itimerspec new_value = {0};
-            struct itimerspec curr_value
+            struct itimerspec curr_value;
             ret = timer_settime(tid, 0, &new_value, &curr_value);
             if(ret < 0) {
                 fprintf(stderr, "failed to stop timer: %s\n", strerror(errno));

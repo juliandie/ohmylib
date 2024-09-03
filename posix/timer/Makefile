@@ -2,25 +2,23 @@
 obj-elf := $(shell basename $(shell pwd))
 
 ### Simplified CFLAGS
-INCLUDES ?= ../../inc/
+INCLUDES ?=
 DEFINES ?=
 
 ### Simplified LDFLAGS
-LIBPATHS ?= ../../
-LIBRARIES ?= ohmylib rt
+LIBPATHS ?=
+LIBRARIES ?= rt
 
 ### CFLAGS
 CFLAGS := -Wextra -Wall -Og -g
 CFLAGS += $(call cc-option,-fno-PIE)
-CFLAGS += $(INCLUDES:%=-I%)
-CFLAGS += $(DEFINES:%=-D%)
-CFLAGS += $(LIBPATHS:%=-L%)
+CFLAGS += $(INCLUDES:%=-I%) $(DEFINES:%=-D%) $(LIBPATHS:%=-L%)
 
 ### Linked libraries
 LLINK := -pthread $(LIBRARIES:%=-l%)
 
 ### LDFLAGS
-LDFLAGS ?= -Wl,--start-group $(LIBRARIES:%=-l%) -Wl,--end-group
+LDFLAGS ?= -Wl,--start-group $(LLINK) -Wl,--end-group
 
 obj-c := $(wildcard *.c */*.c)
 obj-cpp := $(wildcard *.cpp */*.cpp)
