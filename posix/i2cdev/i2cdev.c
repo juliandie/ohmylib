@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
     int fd;
 
     if(argc < 3) { 
-        fprintf(stderr, "usage: %s <i2cdev> <addr> <offset>\n");
+        fprintf(stderr, "usage: %s <i2cdev> <addr> <offset>\n", argv[0]);
         return -1;
     }
 
